@@ -1,0 +1,1088 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dog Rescue Adoption API</title>
+  <meta name="description" content="A multi-rescue dog adoption platform API. Register rescues, list dogs, and submit adoption requests." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    /* ─── Reset & Base ─────────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --amber:  #f59e0b;
+      --amber-light: #fef3c7;
+      --amber-dark: #d97706;
+      --brown:  #78350f;
+      --slate:  #1e293b;
+      --slate-mid: #334155;
+      --slate-light: #64748b;
+      --muted:  #f8fafc;
+      --border: #e2e8f0;
+      --white:  #ffffff;
+      --radius: 12px;
+      --radius-sm: 8px;
+      --shadow-sm: 0 1px 3px rgba(0,0,0,.08), 0 1px 2px rgba(0,0,0,.06);
+      --shadow:    0 4px 16px rgba(0,0,0,.08), 0 2px 4px rgba(0,0,0,.06);
+      --shadow-lg: 0 20px 48px rgba(0,0,0,.12), 0 8px 16px rgba(0,0,0,.06);
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      font-size: 16px;
+      line-height: 1.6;
+      color: var(--slate);
+      background: var(--white);
+    }
+
+    /* ─── Nav ───────────────────────────────────────────────────────── */
+    .nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(255,255,255,.92);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 24px;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 1.1rem;
+      color: var(--slate);
+    }
+    .nav-logo .paw { font-size: 1.4rem; }
+    .nav-links {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+    .nav-links a {
+      text-decoration: none;
+      color: var(--slate-light);
+      font-weight: 500;
+      font-size: .9rem;
+      padding: 6px 12px;
+      border-radius: var(--radius-sm);
+      transition: color .2s, background .2s;
+    }
+    .nav-links a:hover { color: var(--slate); background: var(--muted); }
+    .nav-links .btn-primary {
+      background: var(--amber);
+      color: var(--brown);
+      padding: 8px 18px;
+    }
+    .nav-links .btn-primary:hover { background: var(--amber-dark); color: var(--white); }
+
+    /* ─── Hero ──────────────────────────────────────────────────────── */
+    .hero {
+      background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 40%, #fde68a 100%);
+      border-bottom: 1px solid #fde68a;
+      padding: 80px 24px 72px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23f59e0b' fill-opacity='0.06'%3E%3Ccircle cx='30' cy='30' r='4'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+      pointer-events: none;
+    }
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: white;
+      border: 1px solid #fde68a;
+      color: var(--amber-dark);
+      font-size: .8rem;
+      font-weight: 600;
+      padding: 5px 14px;
+      border-radius: 999px;
+      margin-bottom: 24px;
+      box-shadow: var(--shadow-sm);
+    }
+    .hero h1 {
+      font-size: clamp(2.4rem, 5vw, 3.6rem);
+      font-weight: 800;
+      line-height: 1.15;
+      color: var(--slate);
+      margin-bottom: 20px;
+      max-width: 700px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .hero h1 span { color: var(--amber-dark); }
+    .hero p {
+      font-size: 1.15rem;
+      color: var(--slate-mid);
+      max-width: 580px;
+      margin: 0 auto 36px;
+      font-weight: 400;
+    }
+    .hero-actions {
+      display: flex;
+      gap: 14px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 13px 26px;
+      border-radius: var(--radius-sm);
+      font-weight: 600;
+      font-size: .95rem;
+      text-decoration: none;
+      transition: all .2s;
+      cursor: pointer;
+      border: none;
+    }
+    .btn-lg { padding: 15px 32px; font-size: 1rem; }
+    .btn-amber { background: var(--amber); color: var(--brown); box-shadow: 0 4px 12px rgba(245,158,11,.35); }
+    .btn-amber:hover { background: var(--amber-dark); color: var(--white); transform: translateY(-1px); box-shadow: 0 6px 20px rgba(245,158,11,.45); }
+    .btn-outline { background: white; color: var(--slate-mid); border: 1.5px solid var(--border); }
+    .btn-outline:hover { border-color: var(--slate-light); color: var(--slate); transform: translateY(-1px); box-shadow: var(--shadow-sm); }
+    .hero-stats {
+      margin-top: 52px;
+      display: flex;
+      gap: 0;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .stat {
+      padding: 0 36px;
+      border-right: 1px solid #fde68a;
+    }
+    .stat:last-child { border-right: none; }
+    .stat-num {
+      font-size: 2rem;
+      font-weight: 800;
+      color: var(--amber-dark);
+      display: block;
+    }
+    .stat-label {
+      font-size: .82rem;
+      font-weight: 500;
+      color: var(--slate-light);
+      text-transform: uppercase;
+      letter-spacing: .06em;
+    }
+
+    /* ─── Section layout ────────────────────────────────────────────── */
+    section { padding: 72px 24px; }
+    .container { max-width: 1200px; margin: 0 auto; }
+    .section-label {
+      font-size: .78rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .1em;
+      color: var(--amber-dark);
+      margin-bottom: 10px;
+    }
+    h2 {
+      font-size: clamp(1.7rem, 3vw, 2.3rem);
+      font-weight: 800;
+      color: var(--slate);
+      line-height: 1.2;
+      margin-bottom: 14px;
+    }
+    .section-intro {
+      font-size: 1.05rem;
+      color: var(--slate-light);
+      max-width: 540px;
+      margin-bottom: 48px;
+    }
+
+    /* ─── Features ──────────────────────────────────────────────────── */
+    .features { background: var(--muted); }
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 24px;
+    }
+    .feature-card {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 28px;
+      box-shadow: var(--shadow-sm);
+      transition: box-shadow .2s, transform .2s;
+    }
+    .feature-card:hover { box-shadow: var(--shadow); transform: translateY(-2px); }
+    .feature-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      background: var(--amber-light);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      margin-bottom: 16px;
+    }
+    .feature-card h3 { font-size: 1.05rem; font-weight: 700; color: var(--slate); margin-bottom: 8px; }
+    .feature-card p { font-size: .9rem; color: var(--slate-light); line-height: 1.6; }
+
+    /* ─── Endpoints ─────────────────────────────────────────────────── */
+    .endpoints-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+      gap: 20px;
+    }
+    .endpoint-group {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+    }
+    .endpoint-group-header {
+      padding: 16px 20px;
+      background: var(--muted);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .endpoint-group-header .group-icon { font-size: 1.2rem; }
+    .endpoint-group-header h3 { font-size: .95rem; font-weight: 700; color: var(--slate); }
+    .endpoint-group-header p { font-size: .8rem; color: var(--slate-light); margin-top: 1px; }
+    .endpoint-list { padding: 8px 0; }
+    .endpoint-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 20px;
+      border-bottom: 1px solid var(--border);
+      transition: background .15s;
+    }
+    .endpoint-item:last-child { border-bottom: none; }
+    .endpoint-item:hover { background: var(--muted); }
+    .method {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: .7rem;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 5px;
+      min-width: 48px;
+      text-align: center;
+      letter-spacing: .02em;
+    }
+    .method-get    { background: #dcfce7; color: #15803d; }
+    .method-post   { background: #dbeafe; color: #1d4ed8; }
+    .method-put    { background: #fef3c7; color: #b45309; }
+    .method-delete { background: #fee2e2; color: #b91c1c; }
+    .endpoint-path {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: .8rem;
+      color: var(--slate-mid);
+      flex: 1;
+    }
+    .endpoint-desc { font-size: .8rem; color: var(--slate-light); }
+
+    /* ─── Quick-start ───────────────────────────────────────────────── */
+    .quickstart { background: var(--slate); }
+    .quickstart .section-label { color: var(--amber); }
+    .quickstart h2 { color: white; }
+    .quickstart .section-intro { color: #94a3b8; }
+    .qs-tabs {
+      display: flex;
+      gap: 4px;
+      margin-bottom: 0;
+      background: rgba(255,255,255,.06);
+      padding: 4px;
+      border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+      width: fit-content;
+    }
+    .qs-tab {
+      padding: 8px 18px;
+      border-radius: 6px;
+      font-size: .85rem;
+      font-weight: 500;
+      color: #94a3b8;
+      cursor: pointer;
+      transition: all .2s;
+      border: none;
+      background: transparent;
+    }
+    .qs-tab.active { background: rgba(255,255,255,.12); color: white; }
+    .qs-tab:hover:not(.active) { color: #cbd5e1; }
+    .code-block {
+      background: #0f172a;
+      border: 1px solid rgba(255,255,255,.08);
+      border-radius: 0 var(--radius-sm) var(--radius-sm) var(--radius-sm);
+      padding: 24px 28px;
+      overflow-x: auto;
+      display: none;
+    }
+    .code-block.active { display: block; }
+    .code-block pre {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: .82rem;
+      line-height: 1.7;
+      color: #e2e8f0;
+      white-space: pre;
+    }
+    .code-block pre .comment { color: #64748b; }
+    .code-block pre .cmd { color: #34d399; }
+    .code-block pre .flag  { color: #fbbf24; }
+    .code-block pre .str   { color: #f9a8d4; }
+    .code-block pre .url   { color: #7dd3fc; }
+    .code-block pre .kw    { color: #a78bfa; }
+
+    .qs-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 28px;
+      align-items: start;
+    }
+    @media (max-width: 768px) { .qs-grid { grid-template-columns: 1fr; } }
+    .qs-steps { display: flex; flex-direction: column; gap: 20px; }
+    .qs-step {
+      display: flex;
+      gap: 14px;
+    }
+    .qs-step-num {
+      width: 32px;
+      height: 32px;
+      min-width: 32px;
+      border-radius: 50%;
+      background: var(--amber);
+      color: var(--brown);
+      font-weight: 800;
+      font-size: .9rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .qs-step-content h4 { color: white; font-size: .95rem; font-weight: 600; margin-bottom: 4px; }
+    .qs-step-content p { color: #94a3b8; font-size: .88rem; }
+    .qs-step-content code {
+      font-family: 'JetBrains Mono', monospace;
+      background: rgba(245,158,11,.15);
+      color: var(--amber);
+      padding: 1px 6px;
+      border-radius: 4px;
+      font-size: .8rem;
+    }
+
+    /* ─── Data model ────────────────────────────────────────────────── */
+    .schema-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 24px;
+    }
+    .schema-card {
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+    }
+    .schema-header {
+      padding: 14px 20px;
+      background: var(--muted);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .schema-header .schema-icon { font-size: 1.1rem; }
+    .schema-header h3 { font-size: .9rem; font-weight: 700; color: var(--slate); }
+    .schema-header .badge {
+      margin-left: auto;
+      background: var(--amber-light);
+      color: var(--amber-dark);
+      font-size: .7rem;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 999px;
+    }
+    .schema-fields { padding: 4px 0; }
+    .schema-field {
+      display: grid;
+      grid-template-columns: 140px 1fr;
+      gap: 8px;
+      padding: 9px 20px;
+      border-bottom: 1px solid var(--border);
+      align-items: baseline;
+    }
+    .schema-field:last-child { border-bottom: none; }
+    .field-name {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: .78rem;
+      color: var(--slate-mid);
+      font-weight: 500;
+    }
+    .field-name .required-star { color: #ef4444; }
+    .field-type {
+      font-size: .78rem;
+      color: var(--slate-light);
+    }
+    .field-type code {
+      font-family: 'JetBrains Mono', monospace;
+      background: #f1f5f9;
+      padding: 1px 5px;
+      border-radius: 3px;
+      font-size: .75rem;
+    }
+
+    /* ─── Auth ──────────────────────────────────────────────────────── */
+    .auth { background: var(--muted); }
+    .auth-card {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 32px;
+      box-shadow: var(--shadow-sm);
+      max-width: 640px;
+    }
+    .auth-card p { font-size: .95rem; color: var(--slate-mid); margin-bottom: 20px; }
+    .auth-example {
+      background: #0f172a;
+      border-radius: var(--radius-sm);
+      padding: 18px 22px;
+      margin-top: 20px;
+    }
+    .auth-example pre {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: .82rem;
+      color: #e2e8f0;
+      line-height: 1.7;
+    }
+    .auth-example .key { color: #fbbf24; }
+    .auth-example .val { color: #34d399; }
+    .auth-table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+    .auth-table th, .auth-table td {
+      text-align: left;
+      padding: 10px 14px;
+      font-size: .86rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .auth-table th {
+      background: var(--muted);
+      font-weight: 600;
+      color: var(--slate);
+      font-size: .78rem;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+    }
+    .auth-table td { color: var(--slate-mid); }
+    .auth-table td code {
+      font-family: 'JetBrains Mono', monospace;
+      background: #f1f5f9;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: .8rem;
+    }
+    .lock-icon { font-size: .9em; }
+    .open-icon { color: #16a34a; font-size: .9em; }
+
+    /* ─── CTA ───────────────────────────────────────────────────────── */
+    .cta-section {
+      background: linear-gradient(135deg, var(--amber-dark) 0%, #f59e0b 100%);
+      text-align: center;
+      padding: 72px 24px;
+    }
+    .cta-section h2 { color: white; font-size: clamp(1.8rem, 3vw, 2.4rem); margin-bottom: 14px; }
+    .cta-section p { color: rgba(255,255,255,.85); font-size: 1.05rem; max-width: 480px; margin: 0 auto 32px; }
+    .btn-white { background: white; color: var(--amber-dark); }
+    .btn-white:hover { background: var(--amber-light); }
+    .btn-dark { background: var(--brown); color: white; }
+    .btn-dark:hover { background: #92400e; }
+
+    /* ─── Footer ────────────────────────────────────────────────────── */
+    footer {
+      background: var(--slate);
+      color: #94a3b8;
+      padding: 40px 24px;
+      text-align: center;
+    }
+    footer a { color: var(--amber); text-decoration: none; }
+    footer a:hover { text-decoration: underline; }
+    footer .footer-inner { max-width: 1200px; margin: 0 auto; }
+    footer .footer-logo { font-weight: 700; color: white; font-size: 1rem; margin-bottom: 8px; }
+    footer p { font-size: .85rem; }
+
+    /* ─── Filters table ─────────────────────────────────────────────── */
+    .filter-table { width: 100%; border-collapse: collapse; }
+    .filter-table th, .filter-table td {
+      text-align: left;
+      padding: 10px 14px;
+      font-size: .86rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .filter-table th {
+      background: var(--muted);
+      font-weight: 600;
+      color: var(--slate);
+      font-size: .78rem;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+    }
+    .filter-table td { color: var(--slate-mid); }
+    .filter-table td code {
+      font-family: 'JetBrains Mono', monospace;
+      background: #f1f5f9;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: .8rem;
+    }
+    .filter-table-wrap {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+    }
+
+    /* ─── Responsive ────────────────────────────────────────────────── */
+    @media (max-width: 600px) {
+      .nav-links a:not(.btn-primary) { display: none; }
+      .stat { padding: 0 20px; }
+      .hero-stats { gap: 12px; }
+      .qs-tabs { flex-wrap: wrap; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ─── Navigation ─────────────────────────────────────────────────── -->
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="#" class="nav-logo">
+      <span class="paw">🐾</span>
+      Dog Rescue API
+    </a>
+    <div class="nav-links">
+      <a href="#features">Features</a>
+      <a href="#endpoints">Endpoints</a>
+      <a href="#quickstart">Quick Start</a>
+      <a href="api.html" class="btn-primary btn">API Reference</a>
+    </div>
+  </div>
+</nav>
+
+<!-- ─── Hero ───────────────────────────────────────────────────────── -->
+<section class="hero">
+  <div class="hero-badge">🐶 OpenAPI 3.0 · Mock-ready · Multi-rescue</div>
+  <h1>The <span>Dog Rescue</span><br/>Adoption API</h1>
+  <p>
+    Connect rescue organisations and adopters on a single, open platform.
+    Add dogs, browse across every rescue, and submit adoption requests — all through a documented REST API.
+  </p>
+  <div class="hero-actions">
+    <a href="api.html" class="btn btn-amber btn-lg">📖 View API Reference</a>
+    <a href="#quickstart" class="btn btn-outline btn-lg">⚡ Quick Start</a>
+  </div>
+  <div class="hero-stats">
+    <div class="stat">
+      <span class="stat-num">10</span>
+      <span class="stat-label">Endpoints</span>
+    </div>
+    <div class="stat">
+      <span class="stat-num">3</span>
+      <span class="stat-label">Resource Types</span>
+    </div>
+    <div class="stat">
+      <span class="stat-num">OAS3</span>
+      <span class="stat-label">Standard</span>
+    </div>
+    <div class="stat">
+      <span class="stat-num">Mock</span>
+      <span class="stat-label">Ready</span>
+    </div>
+  </div>
+</section>
+
+<!-- ─── Features ──────────────────────────────────────────────────── -->
+<section class="features" id="features">
+  <div class="container">
+    <p class="section-label">Features</p>
+    <h2>Everything a rescue platform needs</h2>
+    <p class="section-intro">A clean, RESTful API designed for real-world rescue operations from day one.</p>
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon">🏠</div>
+        <h3>Multi-rescue support</h3>
+        <p>Any rescue organisation can register and manage their own dogs independently, with full isolation per rescue.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🔍</div>
+        <h3>Cross-rescue discovery</h3>
+        <p>Adopters can browse and filter dogs across <em>all</em> rescues in one request — by breed, age, size or status.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">📋</div>
+        <h3>Adoption requests</h3>
+        <p>Potential adopters can submit structured adoption requests directly through the API, with household details.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🔒</div>
+        <h3>Secure write operations</h3>
+        <p>All mutations (create, update, delete) require an API key header, keeping public reads open for adopters.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">⚡</div>
+        <h3>Mock server included</h3>
+        <p>Run <code style="background:#f1f5f9;padding:2px 6px;border-radius:4px;font-size:.85em">docker compose up</code> to get a fully functional mock server on port 4010 — no backend needed.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">📄</div>
+        <h3>OpenAPI 3.0.3 spec</h3>
+        <p>Fully documented contract with rich schemas, inline examples, reusable components, and pagination support.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── Endpoints ─────────────────────────────────────────────────── -->
+<section id="endpoints">
+  <div class="container">
+    <p class="section-label">API Endpoints</p>
+    <h2>Three resource groups, ten endpoints</h2>
+    <p class="section-intro">Organised around rescues, dogs, and adoption requests — the three core concepts of the platform.</p>
+    <div class="endpoints-grid">
+
+      <div class="endpoint-group">
+        <div class="endpoint-group-header">
+          <span class="group-icon">🏠</span>
+          <div>
+            <h3>Rescues</h3>
+            <p>Register and manage rescue organisations</p>
+          </div>
+        </div>
+        <div class="endpoint-list">
+          <div class="endpoint-item">
+            <span class="method method-get">GET</span>
+            <span class="endpoint-path">/rescues</span>
+            <span class="endpoint-desc">List all rescues</span>
+          </div>
+          <div class="endpoint-item">
+            <span class="method method-post">POST</span>
+            <span class="endpoint-path">/rescues</span>
+            <span class="endpoint-desc">Register a rescue</span>
+          </div>
+          <div class="endpoint-item">
+            <span class="method method-get">GET</span>
+            <span class="endpoint-path">/rescues/{rescueId}</span>
+            <span class="endpoint-desc">Get a rescue</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="endpoint-group">
+        <div class="endpoint-group-header">
+          <span class="group-icon">🐕</span>
+          <div>
+            <h3>Dogs</h3>
+            <p>Add, browse, update and remove dogs</p>
+          </div>
+        </div>
+        <div class="endpoint-list">
+          <div class="endpoint-item">
+            <span class="method method-get">GET</span>
+            <span class="endpoint-path">/rescues/{rescueId}/dogs</span>
+            <span class="endpoint-desc">List dogs by rescue</span>
+          </div>
+          <div class="endpoint-item">
+            <span class="method method-post">POST</span>
+            <span class="endpoint-path">/rescues/{rescueId}/dogs</span>
+            <span class="endpoint-desc">Add a dog</span>
+          </div>
+          <div class="endpoint-item">
+            <span class="method method-get">GET</span>
+            <span class="endpoint-path">/dogs</span>
+            <span class="endpoint-desc">List all dogs (all rescues)</span>
+          </div>
+          <div class="endpoint-item">
+            <span class="method method-get">GET</span>
+            <span class="endpoint-path">/dogs/{dogId}</span>
+            <span class="endpoint-desc">Get a dog</span>
+          </div>
+          <div class="endpoint-item">
+            <span class="method method-put">PUT</span>
+            <span class="endpoint-path">/dogs/{dogId}</span>
+            <span class="endpoint-desc">Update a dog</span>
+          </div>
+          <div class="endpoint-item">
+            <span class="method method-delete">DELETE</span>
+            <span class="endpoint-path">/dogs/{dogId}</span>
+            <span class="endpoint-desc">Remove a dog</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="endpoint-group">
+        <div class="endpoint-group-header">
+          <span class="group-icon">💌</span>
+          <div>
+            <h3>Adoptions</h3>
+            <p>Submit adoption requests for dogs</p>
+          </div>
+        </div>
+        <div class="endpoint-list">
+          <div class="endpoint-item">
+            <span class="method method-post">POST</span>
+            <span class="endpoint-path">/dogs/{dogId}/adoptions</span>
+            <span class="endpoint-desc">Submit adoption request</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="endpoint-group">
+        <div class="endpoint-group-header">
+          <span class="group-icon">🔎</span>
+          <div>
+            <h3>Dog Filters</h3>
+            <p>Narrow results on list endpoints</p>
+          </div>
+        </div>
+        <div style="padding: 8px 0;">
+          <table class="filter-table">
+            <thead>
+              <tr><th>Parameter</th><th>Description</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><code>breed</code></td><td>Filter by breed</td></tr>
+              <tr><td><code>maxAgeYears</code></td><td>Maximum age (years)</td></tr>
+              <tr><td><code>status</code></td><td>available / reserved / adopted</td></tr>
+              <tr><td><code>page</code></td><td>Page number (default 1)</td></tr>
+              <tr><td><code>limit</code></td><td>Per page (default 20, max 100)</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ─── Quick Start ────────────────────────────────────────────────── -->
+<section class="quickstart" id="quickstart">
+  <div class="container">
+    <p class="section-label">Quick Start</p>
+    <h2>Up and running in minutes</h2>
+    <p class="section-intro">Run the mock server locally with Docker, then start making requests immediately.</p>
+    <div class="qs-grid">
+      <div class="qs-steps">
+        <div class="qs-step">
+          <div class="qs-step-num">1</div>
+          <div class="qs-step-content">
+            <h4>Clone the repository</h4>
+            <p>Clone <code>dataGriff/dog.rescue.api</code> to your local machine.</p>
+          </div>
+        </div>
+        <div class="qs-step">
+          <div class="qs-step-num">2</div>
+          <div class="qs-step-content">
+            <h4>Start the services</h4>
+            <p>Run <code>docker compose up</code> to start both the docs site and the mock server.</p>
+          </div>
+        </div>
+        <div class="qs-step">
+          <div class="qs-step-num">3</div>
+          <div class="qs-step-content">
+            <h4>Read the docs</h4>
+            <p>Open <code>http://localhost:8080</code> to view this site with the full API reference.</p>
+          </div>
+        </div>
+        <div class="qs-step">
+          <div class="qs-step-num">4</div>
+          <div class="qs-step-content">
+            <h4>Hit the mock server</h4>
+            <p>The Prism mock on <code>http://localhost:4010</code> responds with example data immediately — no backend needed.</p>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="qs-tabs">
+          <button class="qs-tab active" onclick="showTab('tab-start', this)">Start</button>
+          <button class="qs-tab" onclick="showTab('tab-list', this)">List dogs</button>
+          <button class="qs-tab" onclick="showTab('tab-add', this)">Add a dog</button>
+          <button class="qs-tab" onclick="showTab('tab-adopt', this)">Adopt</button>
+        </div>
+        <div id="tab-start" class="code-block active">
+<pre><span class="comment"># Clone and start everything</span>
+<span class="cmd">git</span> clone https://github.com/dataGriff/dog.rescue.api
+<span class="cmd">cd</span> dog.rescue.api
+<span class="cmd">docker compose up</span>
+
+<span class="comment"># Services available at:</span>
+<span class="comment">#   Docs site   → http://localhost:8080</span>
+<span class="comment">#   Mock server → http://localhost:4010</span></pre>
+        </div>
+        <div id="tab-list" class="code-block">
+<pre><span class="comment"># List all dogs across every rescue</span>
+<span class="cmd">curl</span> <span class="url">http://localhost:4010/dogs</span>
+
+<span class="comment"># Filter by breed and status</span>
+<span class="cmd">curl</span> <span class="url">"http://localhost:4010/dogs?breed=Labrador&amp;status=available"</span>
+
+<span class="comment"># List dogs from a specific rescue</span>
+<span class="cmd">curl</span> <span class="url">http://localhost:4010/rescues/a3bb189e-8bf9-3888-9912-ace4e6543002/dogs</span></pre>
+        </div>
+        <div id="tab-add" class="code-block">
+<pre><span class="comment"># Add a dog to a rescue (requires X-API-Key)</span>
+<span class="cmd">curl</span> <span class="flag">-X POST</span> <span class="url">http://localhost:4010/rescues/a3bb189e-8bf9-3888-9912-ace4e6543002/dogs</span> \
+  <span class="flag">-H</span> <span class="str">"Content-Type: application/json"</span> \
+  <span class="flag">-H</span> <span class="str">"X-API-Key: my-secret-key"</span> \
+  <span class="flag">-d</span> <span class="str">'{
+    "name": "Max",
+    "breed": "Golden Retriever",
+    "ageYears": 2,
+    "sex": "male",
+    "size": "large",
+    "status": "available"
+  }'</span></pre>
+        </div>
+        <div id="tab-adopt" class="code-block">
+<pre><span class="comment"># Submit an adoption request</span>
+<span class="cmd">curl</span> <span class="flag">-X POST</span> <span class="url">http://localhost:4010/dogs/f47ac10b-58cc-4372-a567-0e02b2c3d479/adoptions</span> \
+  <span class="flag">-H</span> <span class="str">"Content-Type: application/json"</span> \
+  <span class="flag">-d</span> <span class="str">'{
+    "adopterName": "Jane Smith",
+    "adopterEmail": "jane@example.com",
+    "adopterPhone": "+441987654321",
+    "message": "I have a large garden and lots of experience with Labradors.",
+    "hasGarden": true
+  }'</span></pre>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── Data model ─────────────────────────────────────────────────── -->
+<section id="schemas">
+  <div class="container">
+    <p class="section-label">Data Model</p>
+    <h2>Core resource schemas</h2>
+    <p class="section-intro">All resources are fully documented in the API reference. Here's a quick overview of the key fields.</p>
+    <div class="schema-grid">
+
+      <div class="schema-card">
+        <div class="schema-header">
+          <span class="schema-icon">🏠</span>
+          <h3>Rescue</h3>
+          <span class="badge">rescue</span>
+        </div>
+        <div class="schema-fields">
+          <div class="schema-field">
+            <span class="field-name">id <span class="required-star">*</span></span>
+            <span class="field-type"><code>uuid</code></span>
+          </div>
+          <div class="schema-field">
+            <span class="field-name">name <span class="required-star">*</span></span>
+            <span class="field-type"><code>string</code> — Organisation name</span>
+          </div>
+          <div class="schema-field">
+            <span class="field-name">email <span class="required-star">*</span></span>
+            <span class="field-type"><code>email</code></span>
+          </div>
+          <div class="schema-field">
+            <span class="field-name">location <span class="required-star">*</span></span>
+            <span class="field-type"><code>Location</code> object</span>
+          </div>
+          <div class="schema-field">
+            <span class="field-name">phone</span>
+            <span class="field-type"><code>string</code></span>
+          </div>
+          <div class="schema-field">
+            <span class="field-name">website</span>
+            <span class="field-type"><code>uri</code></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="schema-card">
+        <div class="schema-header">
+          <span class="schema-icon">🐕</span>
+          <h3>Dog</h3>
+          <span class="badge">dog</span>
+        </div>
+        <div class="schema-fields">
+          <div class="schema-field">
+            <span class="field-name">id <span class="required-star">*</span></span>
+            <span class="field-type"><code>uuid</code></span>
+          </div>
+          <div class="schema-field">
+            <span class="field-name">rescueId <span class="required-star">*</span></span>
+            <span class="field-type"><code>uuid</code> — Owning rescue</span>
+          </div>
+          <div class="schema-field">
+            <span class="field-name">name <span class="required-star">*</span></span>
+            <span class="field-type"><code>string</code></span>
+          </div>
+          <div class="schema-field">
+            <span class="field-name">breed <span class="required-star">*</span></span>
+            <span class="field-type"><code>string</code></span>
+          </div>
+          <div class="schema-field">
+            <span class="field-name">ageYears <span class="required-star">*</span></span>
+            <span class="field-type"><code>float</code> — Can be fractional</span>
+          </div>
+          <div class="schema-field">
+            <span class="field-name">status <span class="required-star">*</span></span>
+            <span class="field-type"><code>available</code> | <code>reserved</code> | <code>adopted</code></span>
+          </div>
+          <div class="schema-field">
+            <span class="field-name">sex <span class="required-star">*</span></span>
+            <span class="field-type"><code>male</code> | <code>female</code></span>
+          </div>
+          <div class="schema-field">
+            <span class="field-name">size</span>
+            <span class="field-type"><code>small</code> | <code>medium</code> | <code>large</code></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="schema-card">
+        <div class="schema-header">
+          <span class="schema-icon">💌</span>
+          <h3>AdoptionRequest</h3>
+          <span class="badge">adoption</span>
+        </div>
+        <div class="schema-fields">
+          <div class="schema-field">
+            <span class="field-name">id <span class="required-star">*</span></span>
+            <span class="field-type"><code>uuid</code></span>
+          </div>
+          <div class="schema-field">
+            <span class="field-name">dogId <span class="required-star">*</span></span>
+            <span class="field-type"><code>uuid</code></span>
+          </div>
+          <div class="schema-field">
+            <span class="field-name">adopterName <span class="required-star">*</span></span>
+            <span class="field-type"><code>string</code></span>
+          </div>
+          <div class="schema-field">
+            <span class="field-name">adopterEmail <span class="required-star">*</span></span>
+            <span class="field-type"><code>email</code></span>
+          </div>
+          <div class="schema-field">
+            <span class="field-name">message <span class="required-star">*</span></span>
+            <span class="field-type"><code>string</code></span>
+          </div>
+          <div class="schema-field">
+            <span class="field-name">status <span class="required-star">*</span></span>
+            <span class="field-type"><code>pending</code> | <code>approved</code> | <code>rejected</code></span>
+          </div>
+          <div class="schema-field">
+            <span class="field-name">hasGarden</span>
+            <span class="field-type"><code>boolean</code></span>
+          </div>
+          <div class="schema-field">
+            <span class="field-name">otherPets</span>
+            <span class="field-type"><code>string</code></span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ─── Auth ──────────────────────────────────────────────────────── -->
+<section class="auth" id="auth">
+  <div class="container">
+    <p class="section-label">Authentication</p>
+    <h2>API key authentication</h2>
+    <p class="section-intro">Read operations are publicly accessible. Write operations require an API key.</p>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:28px;align-items:start;">
+      <div class="auth-card">
+        <p>Include your API key as a request header on all write operations. The mock server accepts any non-empty value for local development.</p>
+        <div class="auth-example">
+          <pre><span class="key">X-API-Key</span><span>: </span><span class="val">your-api-key-here</span></pre>
+        </div>
+        <table class="auth-table" style="margin-top:20px;">
+          <thead><tr><th>Operation</th><th>Method(s)</th><th>Auth required</th></tr></thead>
+          <tbody>
+            <tr><td>Register rescue</td><td><code>POST</code></td><td>🔒 Yes</td></tr>
+            <tr><td>Add / update dog</td><td><code>POST</code> <code>PUT</code></td><td>🔒 Yes</td></tr>
+            <tr><td>Delete dog</td><td><code>DELETE</code></td><td>🔒 Yes</td></tr>
+            <tr><td>Browse rescues &amp; dogs</td><td><code>GET</code></td><td>✅ Open</td></tr>
+            <tr><td>Submit adoption request</td><td><code>POST</code></td><td>✅ Open</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="auth-card">
+        <p>All API responses follow a consistent structure. Errors always include a machine-readable <code>code</code> and a human-readable <code>message</code>.</p>
+        <div class="auth-example">
+<pre style="color:#e2e8f0;font-size:.82rem;line-height:1.7;">{
+  <span style="color:#7dd3fc">"code"</span>: <span style="color:#f9a8d4">"VALIDATION_ERROR"</span>,
+  <span style="color:#7dd3fc">"message"</span>: <span style="color:#f9a8d4">"Request validation failed."</span>,
+  <span style="color:#7dd3fc">"details"</span>: [
+    <span style="color:#f9a8d4">"'name' is required"</span>
+  ]
+}</pre>
+        </div>
+        <table class="auth-table" style="margin-top:20px;">
+          <thead><tr><th>Status</th><th>Meaning</th></tr></thead>
+          <tbody>
+            <tr><td><code>200</code> / <code>201</code></td><td>Success</td></tr>
+            <tr><td><code>204</code></td><td>Deleted (no body)</td></tr>
+            <tr><td><code>400</code></td><td>Validation error</td></tr>
+            <tr><td><code>401</code></td><td>Missing / invalid API key</td></tr>
+            <tr><td><code>404</code></td><td>Resource not found</td></tr>
+            <tr><td><code>409</code></td><td>Conflict (e.g. dog unavailable)</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── CTA ───────────────────────────────────────────────────────── -->
+<section class="cta-section">
+  <div class="container">
+    <h2>Ready to explore the full spec?</h2>
+    <p>Browse every endpoint, schema, and example in the interactive API reference.</p>
+    <div class="hero-actions">
+      <a href="api.html" class="btn btn-white btn-lg">📖 Open API Reference</a>
+      <a href="https://github.com/dataGriff/dog.rescue.api" class="btn btn-dark btn-lg" target="_blank" rel="noopener">⭐ View on GitHub</a>
+    </div>
+  </div>
+</section>
+
+<!-- ─── Footer ────────────────────────────────────────────────────── -->
+<footer>
+  <div class="footer-inner">
+    <p class="footer-logo">🐾 Dog Rescue Adoption API</p>
+    <p>
+      OpenAPI 3.0.3 contract &middot;
+      <a href="openapi.yaml" target="_blank">openapi.yaml</a> &middot;
+      <a href="https://github.com/dataGriff/dog.rescue.api" target="_blank" rel="noopener">GitHub</a>
+    </p>
+  </div>
+</footer>
+
+<script>
+  function showTab(id, btn) {
+    document.querySelectorAll('.code-block').forEach(el => el.classList.remove('active'));
+    document.querySelectorAll('.qs-tab').forEach(el => el.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    btn.classList.add('active');
+  }
+</script>
+</body>
+</html>

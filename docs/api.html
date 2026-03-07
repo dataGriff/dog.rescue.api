@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>API Reference — Dog Rescue Adoption API</title>
+  <meta name="description" content="Full interactive API reference for the Dog Rescue Adoption API." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Inter', sans-serif; }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 200;
+      background: rgba(255,255,255,.95);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid #e2e8f0;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      padding: 0 24px;
+      gap: 16px;
+    }
+    .topbar-logo {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 700;
+      font-size: 1rem;
+      color: #1e293b;
+      text-decoration: none;
+    }
+    .topbar-logo .paw { font-size: 1.2rem; }
+    .topbar-divider { color: #cbd5e1; }
+    .topbar-title { color: #64748b; font-size: .9rem; font-weight: 500; }
+    .topbar-back {
+      margin-left: auto;
+      text-decoration: none;
+      font-size: .85rem;
+      font-weight: 500;
+      color: #64748b;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      padding: 6px 12px;
+      border-radius: 6px;
+      transition: background .15s, color .15s;
+    }
+    .topbar-back:hover { background: #f1f5f9; color: #1e293b; }
+
+    #redoc-container { height: calc(100vh - 56px); }
+  </style>
+</head>
+<body>
+  <div class="topbar">
+    <a href="index.html" class="topbar-logo">
+      <span class="paw">🐾</span>
+      Dog Rescue API
+    </a>
+    <span class="topbar-divider">/</span>
+    <span class="topbar-title">API Reference</span>
+    <a href="index.html" class="topbar-back">← Back to overview</a>
+  </div>
+
+  <div id="redoc-container"></div>
+
+  <script src="redoc.standalone.js"></script>
+  <script>
+    Redoc.init(
+      'openapi.yaml',
+      {
+        scrollYOffset: 56,
+        hideDownloadButton: false,
+        expandResponses: '200,201',
+        requiredPropsFirst: true,
+        sortPropsAlphabetically: false,
+        noAutoAuth: false,
+        theme: {
+          colors: {
+            primary: { main: '#d97706' },
+            success: { main: '#16a34a' },
+            warning: { main: '#f59e0b' },
+            error:   { main: '#dc2626' },
+            text: {
+              primary: '#1e293b',
+              secondary: '#64748b'
+            }
+          },
+          typography: {
+            fontSize: '15px',
+            lineHeight: '1.6',
+            fontFamily: "'Inter', sans-serif",
+            headings: {
+              fontFamily: "'Inter', sans-serif",
+              fontWeight: '700'
+            },
+            code: {
+              fontFamily: "'JetBrains Mono', 'Fira Code', monospace",
+              fontSize: '13px'
+            }
+          },
+          sidebar: {
+            width: '280px',
+            backgroundColor: '#f8fafc',
+            textColor: '#334155'
+          },
+          rightPanel: {
+            backgroundColor: '#1e293b',
+            textColor: '#e2e8f0'
+          },
+          logo: {
+            gutter: '20px'
+          }
+        }
+      },
+      document.getElementById('redoc-container')
+    );
+  </script>
+</body>
+</html>

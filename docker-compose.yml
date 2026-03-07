@@ -1,14 +1,14 @@
 services:
-  # Swagger UI – hosted API documentation
-  swagger-ui:
-    image: swaggerapi/swagger-ui:latest
+services:
+  # Custom docs website – landing page + Redoc API reference
+  docs:
+    image: nginx:alpine
     ports:
-      - "8080:8080"
-    environment:
-      SWAGGER_JSON: /api/openapi.yaml
-      BASE_URL: /docs
+      - "8080:80"
     volumes:
+      - ./docs:/usr/share/nginx/html:ro
       - ./openapi.yaml:/api/openapi.yaml:ro
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
     depends_on:
       - mock
 

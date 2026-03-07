@@ -47,7 +47,8 @@ This starts two services:
 
 | Service | URL | Description |
 |---------|-----|-------------|
-| **Swagger UI** | http://localhost:8080/docs | Interactive API documentation |
+| **Docs website** | http://localhost:8080 | Landing page with features, quick start, and schemas |
+| **API Reference** | http://localhost:8080/api.html | Full interactive Redoc API reference |
 | **Prism mock server** | http://localhost:4010 | Mock server backed by the OpenAPI spec |
 
 ### Example mock requests
