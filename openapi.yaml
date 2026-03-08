@@ -1,0 +1,1048 @@
+openapi: 3.0.3
+info:
+  title: Dog Rescue Adoption API
+  description: |
+    The Dog Rescue Adoption API enables rescue organisations to list dogs available for adoption and allows
+    potential adopters to browse and find dogs across all participating rescues.
+
+    ## Key Features
+    - **Multi-rescue support** – Any rescue can register and add dogs to the platform.
+    - **Browse dogs** – Adopters can search and filter dogs across all rescues or within a specific rescue.
+    - **Adoption requests** – Adopters can submit adoption requests for a dog.
+
+    ## Authentication
+    This API uses API key authentication. Include your key in the `X-API-Key` header for write operations.
+  version: 1.0.0
+  contact:
+    name: Dog Rescue API Support
+    url: https://github.com/dataGriff/dog.rescue.api
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+
+servers:
+  - url: https://api.dogrescue.example.com/v1
+    description: Production server
+  - url: http://localhost:4010
+    description: Local mock server (Prism)
+
+tags:
+  - name: Rescues
+    description: Operations related to rescue organisations
+  - name: Dogs
+    description: Operations for managing and browsing dogs available for adoption
+  - name: Adoptions
+    description: Operations for submitting and managing adoption requests
+
+paths:
+  /rescues:
+    get:
+      tags:
+        - Rescues
+      summary: List all rescues
+      description: Returns a list of all registered rescue organisations.
+      operationId: listRescues
+      security: []
+      parameters:
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/LimitParam'
+      responses:
+        '200':
+          description: A paginated list of rescue organisations.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RescueList'
+              examples:
+                example:
+                  $ref: '#/components/examples/RescueListExample'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+    post:
+      tags:
+        - Rescues
+      summary: Register a new rescue
+      description: Registers a new rescue organisation on the platform.
+      operationId: createRescue
+      security:
+        - ApiKeyAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RescueInput'
+            examples:
+              example:
+                $ref: '#/components/examples/RescueInputExample'
+      responses:
+        '201':
+          description: Rescue successfully registered.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Rescue'
+              examples:
+                example:
+                  $ref: '#/components/examples/RescueExample'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /rescues/{rescueId}:
+    parameters:
+      - $ref: '#/components/parameters/RescueIdParam'
+    get:
+      tags:
+        - Rescues
+      summary: Get a rescue by ID
+      description: Returns the details of a specific rescue organisation.
+      operationId: getRescue
+      security: []
+      responses:
+        '200':
+          description: Rescue found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Rescue'
+              examples:
+                example:
+                  $ref: '#/components/examples/RescueExample'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /rescues/{rescueId}/dogs:
+    parameters:
+      - $ref: '#/components/parameters/RescueIdParam'
+    get:
+      tags:
+        - Dogs
+      summary: List dogs from a specific rescue
+      description: Returns all dogs available for adoption from the specified rescue.
+      operationId: listDogsByRescue
+      security: []
+      parameters:
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/LimitParam'
+        - $ref: '#/components/parameters/BreedParam'
+        - $ref: '#/components/parameters/AgeParam'
+        - $ref: '#/components/parameters/StatusParam'
+      responses:
+        '200':
+          description: A paginated list of dogs from this rescue.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DogList'
+              examples:
+                example:
+                  $ref: '#/components/examples/DogListExample'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    post:
+      tags:
+        - Dogs
+      summary: Add a dog to a rescue
+      description: Adds a new dog available for adoption to the specified rescue.
+      operationId: addDogToRescue
+      security:
+        - ApiKeyAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DogInput'
+            examples:
+              example:
+                $ref: '#/components/examples/DogInputExample'
+      responses:
+        '201':
+          description: Dog successfully added.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Dog'
+              examples:
+                example:
+                  $ref: '#/components/examples/DogExample'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /dogs:
+    get:
+      tags:
+        - Dogs
+      summary: List all dogs across all rescues
+      description: |
+        Returns all dogs available for adoption across every registered rescue.
+        Supports filtering by breed, age range, and status.
+      operationId: listDogs
+      security: []
+      parameters:
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/LimitParam'
+        - $ref: '#/components/parameters/BreedParam'
+        - $ref: '#/components/parameters/AgeParam'
+        - $ref: '#/components/parameters/StatusParam'
+      responses:
+        '200':
+          description: A paginated list of dogs.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DogList'
+              examples:
+                example:
+                  $ref: '#/components/examples/DogListExample'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+
+  /dogs/{dogId}:
+    parameters:
+      - $ref: '#/components/parameters/DogIdParam'
+    get:
+      tags:
+        - Dogs
+      summary: Get a dog by ID
+      description: Returns full details for a specific dog.
+      operationId: getDog
+      security: []
+      responses:
+        '200':
+          description: Dog found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Dog'
+              examples:
+                example:
+                  $ref: '#/components/examples/DogExample'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    put:
+      tags:
+        - Dogs
+      summary: Update a dog's details
+      description: Updates information for an existing dog (e.g. status change, profile update).
+      operationId: updateDog
+      security:
+        - ApiKeyAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DogInput'
+            examples:
+              example:
+                $ref: '#/components/examples/DogInputExample'
+      responses:
+        '200':
+          description: Dog successfully updated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Dog'
+              examples:
+                example:
+                  $ref: '#/components/examples/DogExample'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    delete:
+      tags:
+        - Dogs
+      summary: Remove a dog
+      description: Removes a dog from the platform (e.g. after adoption is complete or dog is no longer available).
+      operationId: deleteDog
+      security:
+        - ApiKeyAuth: []
+      responses:
+        '204':
+          description: Dog successfully removed.
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /dogs/{dogId}/adoptions:
+    parameters:
+      - $ref: '#/components/parameters/DogIdParam'
+    post:
+      tags:
+        - Adoptions
+      summary: Submit an adoption request
+      description: Allows a potential adopter to submit a request to adopt a specific dog.
+      operationId: createAdoptionRequest
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AdoptionRequestInput'
+            examples:
+              example:
+                $ref: '#/components/examples/AdoptionRequestInputExample'
+      responses:
+        '201':
+          description: Adoption request submitted successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdoptionRequest'
+              examples:
+                example:
+                  $ref: '#/components/examples/AdoptionRequestExample'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: Dog is not available for adoption.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-Key
+
+  parameters:
+    RescueIdParam:
+      name: rescueId
+      in: path
+      required: true
+      description: Unique identifier for the rescue organisation.
+      schema:
+        type: string
+        format: uuid
+        example: a3bb189e-8bf9-3888-9912-ace4e6543002
+
+    DogIdParam:
+      name: dogId
+      in: path
+      required: true
+      description: Unique identifier for the dog.
+      schema:
+        type: string
+        format: uuid
+        example: f47ac10b-58cc-4372-a567-0e02b2c3d479
+
+    PageParam:
+      name: page
+      in: query
+      required: false
+      description: Page number (1-based).
+      schema:
+        type: integer
+        minimum: 1
+        default: 1
+        example: 1
+
+    LimitParam:
+      name: limit
+      in: query
+      required: false
+      description: Maximum number of results per page.
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+        example: 20
+
+    BreedParam:
+      name: breed
+      in: query
+      required: false
+      description: Filter dogs by breed.
+      schema:
+        type: string
+        example: Labrador
+
+    AgeParam:
+      name: maxAgeYears
+      in: query
+      required: false
+      description: Filter dogs by maximum age in years.
+      schema:
+        type: integer
+        minimum: 0
+        example: 5
+
+    StatusParam:
+      name: status
+      in: query
+      required: false
+      description: Filter dogs by adoption status.
+      schema:
+        $ref: '#/components/schemas/DogStatus'
+
+  schemas:
+    Rescue:
+      type: object
+      required:
+        - id
+        - name
+        - email
+        - location
+        - createdAt
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier for the rescue.
+          example: a3bb189e-8bf9-3888-9912-ace4e6543002
+        name:
+          type: string
+          description: Name of the rescue organisation.
+          example: Happy Paws Rescue
+        description:
+          type: string
+          description: Short description of the rescue.
+          example: A volunteer-run rescue based in Yorkshire helping dogs find forever homes.
+        email:
+          type: string
+          format: email
+          description: Contact email address.
+          example: contact@happypaws.org
+        phone:
+          type: string
+          description: Contact phone number.
+          example: "+441234567890"
+        location:
+          $ref: '#/components/schemas/Location'
+        website:
+          type: string
+          format: uri
+          description: Rescue website URL.
+          example: https://happypaws.org
+        createdAt:
+          type: string
+          format: date-time
+          description: Timestamp when the rescue was registered.
+          example: "2024-01-15T10:30:00Z"
+
+    RescueInput:
+      type: object
+      required:
+        - name
+        - email
+        - location
+      properties:
+        name:
+          type: string
+          description: Name of the rescue organisation.
+          example: Happy Paws Rescue
+        description:
+          type: string
+          description: Short description of the rescue.
+          example: A volunteer-run rescue based in Yorkshire helping dogs find forever homes.
+        email:
+          type: string
+          format: email
+          description: Contact email address.
+          example: contact@happypaws.org
+        phone:
+          type: string
+          description: Contact phone number.
+          example: "+441234567890"
+        location:
+          $ref: '#/components/schemas/Location'
+        website:
+          type: string
+          format: uri
+          description: Rescue website URL.
+          example: https://happypaws.org
+
+    RescueList:
+      type: object
+      required:
+        - data
+        - pagination
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Rescue'
+        pagination:
+          $ref: '#/components/schemas/Pagination'
+
+    Dog:
+      type: object
+      required:
+        - id
+        - rescueId
+        - name
+        - breed
+        - ageYears
+        - sex
+        - status
+        - createdAt
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier for the dog.
+          example: f47ac10b-58cc-4372-a567-0e02b2c3d479
+        rescueId:
+          type: string
+          format: uuid
+          description: ID of the rescue organisation that listed this dog.
+          example: a3bb189e-8bf9-3888-9912-ace4e6543002
+        name:
+          type: string
+          description: Dog's name.
+          example: Buddy
+        breed:
+          type: string
+          description: Dog's breed.
+          example: Labrador Retriever
+        ageYears:
+          type: number
+          format: float
+          minimum: 0
+          description: Dog's age in years (can be fractional, e.g. 0.5 for 6 months).
+          example: 3
+        sex:
+          $ref: '#/components/schemas/DogSex'
+        size:
+          $ref: '#/components/schemas/DogSize'
+        colour:
+          type: string
+          description: Dog's coat colour.
+          example: Golden
+        description:
+          type: string
+          description: Profile description of the dog.
+          example: Buddy is a friendly and energetic Labrador who loves long walks and playing fetch.
+        imageUrl:
+          type: string
+          format: uri
+          description: URL of the dog's profile photo.
+          example: https://example.com/images/buddy.jpg
+        goodWithChildren:
+          type: boolean
+          description: Whether the dog is good with children.
+          example: true
+        goodWithDogs:
+          type: boolean
+          description: Whether the dog is good with other dogs.
+          example: true
+        goodWithCats:
+          type: boolean
+          description: Whether the dog is good with cats.
+          example: false
+        vaccinated:
+          type: boolean
+          description: Whether the dog is up to date with vaccinations.
+          example: true
+        neutered:
+          type: boolean
+          description: Whether the dog has been neutered.
+          example: true
+        status:
+          $ref: '#/components/schemas/DogStatus'
+        createdAt:
+          type: string
+          format: date-time
+          description: Timestamp when the dog was listed.
+          example: "2024-02-20T09:00:00Z"
+
+    DogInput:
+      type: object
+      required:
+        - name
+        - breed
+        - ageYears
+        - sex
+      properties:
+        name:
+          type: string
+          description: Dog's name.
+          example: Buddy
+        breed:
+          type: string
+          description: Dog's breed.
+          example: Labrador Retriever
+        ageYears:
+          type: number
+          format: float
+          minimum: 0
+          description: Dog's age in years (can be fractional, e.g. 0.5 for 6 months).
+          example: 3
+        sex:
+          $ref: '#/components/schemas/DogSex'
+        size:
+          $ref: '#/components/schemas/DogSize'
+        colour:
+          type: string
+          description: Dog's coat colour.
+          example: Golden
+        description:
+          type: string
+          description: Profile description of the dog.
+          example: Buddy is a friendly and energetic Labrador who loves long walks and playing fetch.
+        imageUrl:
+          type: string
+          format: uri
+          description: URL of the dog's profile photo.
+          example: https://example.com/images/buddy.jpg
+        goodWithChildren:
+          type: boolean
+          description: Whether the dog is good with children.
+          example: true
+        goodWithDogs:
+          type: boolean
+          description: Whether the dog is good with other dogs.
+          example: true
+        goodWithCats:
+          type: boolean
+          description: Whether the dog is good with cats.
+          example: false
+        vaccinated:
+          type: boolean
+          description: Whether the dog is up to date with vaccinations.
+          example: true
+        neutered:
+          type: boolean
+          description: Whether the dog has been neutered.
+          example: true
+        status:
+          $ref: '#/components/schemas/DogStatus'
+
+    DogList:
+      type: object
+      required:
+        - data
+        - pagination
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Dog'
+        pagination:
+          $ref: '#/components/schemas/Pagination'
+
+    AdoptionRequestInput:
+      type: object
+      required:
+        - adopterName
+        - adopterEmail
+        - adopterPhone
+        - message
+      properties:
+        adopterName:
+          type: string
+          description: Full name of the potential adopter.
+          example: Jane Smith
+        adopterEmail:
+          type: string
+          format: email
+          description: Email address of the potential adopter.
+          example: jane.smith@example.com
+        adopterPhone:
+          type: string
+          description: Phone number of the potential adopter.
+          example: "+441987654321"
+        message:
+          type: string
+          description: Message from the adopter to the rescue.
+          example: I would love to give Buddy a forever home. I have a large garden and lots of experience with Labradors.
+        hasGarden:
+          type: boolean
+          description: Whether the adopter has a garden.
+          example: true
+        otherPets:
+          type: string
+          description: Description of any other pets in the household.
+          example: One cat, very calm.
+
+    AdoptionRequest:
+      type: object
+      required:
+        - id
+        - dogId
+        - rescueId
+        - adopterName
+        - adopterEmail
+        - adopterPhone
+        - message
+        - status
+        - createdAt
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier for the adoption request.
+          example: c9bf9e57-1685-4c89-bafb-ff5af830be8a
+        dogId:
+          type: string
+          format: uuid
+          description: ID of the dog being adopted.
+          example: f47ac10b-58cc-4372-a567-0e02b2c3d479
+        rescueId:
+          type: string
+          format: uuid
+          description: ID of the rescue organisation.
+          example: a3bb189e-8bf9-3888-9912-ace4e6543002
+        adopterName:
+          type: string
+          description: Full name of the potential adopter.
+          example: Jane Smith
+        adopterEmail:
+          type: string
+          format: email
+          description: Email address of the potential adopter.
+          example: jane.smith@example.com
+        adopterPhone:
+          type: string
+          description: Phone number of the potential adopter.
+          example: "+441987654321"
+        message:
+          type: string
+          description: Message from the adopter to the rescue.
+          example: I would love to give Buddy a forever home. I have a large garden and lots of experience with Labradors.
+        hasGarden:
+          type: boolean
+          description: Whether the adopter has a garden.
+          example: true
+        otherPets:
+          type: string
+          description: Description of any other pets in the household.
+          example: One cat, very calm.
+        status:
+          type: string
+          enum:
+            - pending
+            - approved
+            - rejected
+            - withdrawn
+          description: Status of the adoption request.
+          example: pending
+        createdAt:
+          type: string
+          format: date-time
+          description: Timestamp when the adoption request was submitted.
+          example: "2024-03-01T14:22:00Z"
+
+    DogStatus:
+      type: string
+      enum:
+        - available
+        - reserved
+        - adopted
+        - unavailable
+      description: Current adoption status of the dog.
+      example: available
+
+    DogSex:
+      type: string
+      enum:
+        - male
+        - female
+      description: Sex of the dog.
+      example: male
+
+    DogSize:
+      type: string
+      enum:
+        - small
+        - medium
+        - large
+        - extra-large
+      description: Size category of the dog.
+      example: large
+
+    Location:
+      type: object
+      required:
+        - city
+        - country
+      properties:
+        addressLine1:
+          type: string
+          description: First line of the address.
+          example: 12 Rescue Lane
+        addressLine2:
+          type: string
+          description: Second line of the address.
+          example: Harrogate
+        city:
+          type: string
+          description: City or town.
+          example: Leeds
+        county:
+          type: string
+          description: County or region.
+          example: West Yorkshire
+        postcode:
+          type: string
+          description: Postcode or ZIP code.
+          example: LS1 1AB
+        country:
+          type: string
+          description: Country.
+          example: United Kingdom
+
+    Pagination:
+      type: object
+      required:
+        - page
+        - limit
+        - total
+        - totalPages
+      properties:
+        page:
+          type: integer
+          description: Current page number.
+          example: 1
+        limit:
+          type: integer
+          description: Number of results per page.
+          example: 20
+        total:
+          type: integer
+          description: Total number of results.
+          example: 42
+        totalPages:
+          type: integer
+          description: Total number of pages.
+          example: 3
+
+    Error:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: string
+          description: Machine-readable error code.
+          example: RESOURCE_NOT_FOUND
+        message:
+          type: string
+          description: Human-readable error message.
+          example: The requested resource was not found.
+        details:
+          type: array
+          items:
+            type: string
+          description: Additional error details.
+          example:
+            - "dogId 'f47ac10b-58cc-4372-a567-0e02b2c3d479' does not exist"
+
+  responses:
+    BadRequest:
+      description: Invalid request payload or parameters.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            code: VALIDATION_ERROR
+            message: Request validation failed.
+            details:
+              - "'name' is required"
+
+    Unauthorized:
+      description: Missing or invalid API key.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            code: UNAUTHORIZED
+            message: A valid API key is required.
+
+    NotFound:
+      description: The requested resource was not found.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            code: RESOURCE_NOT_FOUND
+            message: The requested resource was not found.
+
+  examples:
+    RescueExample:
+      value:
+        id: a3bb189e-8bf9-3888-9912-ace4e6543002
+        name: Happy Paws Rescue
+        description: A volunteer-run rescue based in Yorkshire helping dogs find forever homes.
+        email: contact@happypaws.org
+        phone: "+441234567890"
+        location:
+          addressLine1: 12 Rescue Lane
+          city: Leeds
+          county: West Yorkshire
+          postcode: LS1 1AB
+          country: United Kingdom
+        website: https://happypaws.org
+        createdAt: "2024-01-15T10:30:00Z"
+
+    RescueInputExample:
+      value:
+        name: Happy Paws Rescue
+        description: A volunteer-run rescue based in Yorkshire helping dogs find forever homes.
+        email: contact@happypaws.org
+        phone: "+441234567890"
+        location:
+          addressLine1: 12 Rescue Lane
+          city: Leeds
+          county: West Yorkshire
+          postcode: LS1 1AB
+          country: United Kingdom
+        website: https://happypaws.org
+
+    RescueListExample:
+      value:
+        data:
+          - id: a3bb189e-8bf9-3888-9912-ace4e6543002
+            name: Happy Paws Rescue
+            description: A volunteer-run rescue based in Yorkshire helping dogs find forever homes.
+            email: contact@happypaws.org
+            phone: "+441234567890"
+            location:
+              addressLine1: 12 Rescue Lane
+              city: Leeds
+              county: West Yorkshire
+              postcode: LS1 1AB
+              country: United Kingdom
+            website: https://happypaws.org
+            createdAt: "2024-01-15T10:30:00Z"
+          - id: b4cc290f-9cg0-4999-0023-bdf5f7654113
+            name: Second Chances Dog Rescue
+            description: Rehoming dogs across the North East.
+            email: hello@secondchances.org.uk
+            location:
+              city: Newcastle upon Tyne
+              county: Tyne and Wear
+              postcode: NE1 4ST
+              country: United Kingdom
+            createdAt: "2024-02-01T08:00:00Z"
+        pagination:
+          page: 1
+          limit: 20
+          total: 2
+          totalPages: 1
+
+    DogExample:
+      value:
+        id: f47ac10b-58cc-4372-a567-0e02b2c3d479
+        rescueId: a3bb189e-8bf9-3888-9912-ace4e6543002
+        name: Buddy
+        breed: Labrador Retriever
+        ageYears: 3
+        sex: male
+        size: large
+        colour: Golden
+        description: Buddy is a friendly and energetic Labrador who loves long walks and playing fetch.
+        imageUrl: https://example.com/images/buddy.jpg
+        goodWithChildren: true
+        goodWithDogs: true
+        goodWithCats: false
+        vaccinated: true
+        neutered: true
+        status: available
+        createdAt: "2024-02-20T09:00:00Z"
+
+    DogInputExample:
+      value:
+        name: Buddy
+        breed: Labrador Retriever
+        ageYears: 3
+        sex: male
+        size: large
+        colour: Golden
+        description: Buddy is a friendly and energetic Labrador who loves long walks and playing fetch.
+        imageUrl: https://example.com/images/buddy.jpg
+        goodWithChildren: true
+        goodWithDogs: true
+        goodWithCats: false
+        vaccinated: true
+        neutered: true
+        status: available
+
+    DogListExample:
+      value:
+        data:
+          - id: f47ac10b-58cc-4372-a567-0e02b2c3d479
+            rescueId: a3bb189e-8bf9-3888-9912-ace4e6543002
+            name: Buddy
+            breed: Labrador Retriever
+            ageYears: 3
+            sex: male
+            size: large
+            colour: Golden
+            description: Buddy is a friendly and energetic Labrador who loves long walks and playing fetch.
+            imageUrl: https://example.com/images/buddy.jpg
+            goodWithChildren: true
+            goodWithDogs: true
+            goodWithCats: false
+            vaccinated: true
+            neutered: true
+            status: available
+            createdAt: "2024-02-20T09:00:00Z"
+          - id: e36bd01c-47bb-3261-b456-1f13a1b2c368
+            rescueId: b4cc290f-9cg0-4999-0023-bdf5f7654113
+            name: Luna
+            breed: Border Collie
+            ageYears: 1.5
+            sex: female
+            size: medium
+            colour: Black and white
+            description: Luna is an intelligent young Border Collie who needs an active home with space to run.
+            goodWithChildren: true
+            goodWithDogs: false
+            goodWithCats: false
+            vaccinated: true
+            neutered: false
+            status: available
+            createdAt: "2024-03-01T11:00:00Z"
+        pagination:
+          page: 1
+          limit: 20
+          total: 2
+          totalPages: 1
+
+    AdoptionRequestExample:
+      value:
+        id: c9bf9e57-1685-4c89-bafb-ff5af830be8a
+        dogId: f47ac10b-58cc-4372-a567-0e02b2c3d479
+        rescueId: a3bb189e-8bf9-3888-9912-ace4e6543002
+        adopterName: Jane Smith
+        adopterEmail: jane.smith@example.com
+        adopterPhone: "+441987654321"
+        message: I would love to give Buddy a forever home. I have a large garden and lots of experience with Labradors.
+        hasGarden: true
+        otherPets: One cat, very calm.
+        status: pending
+        createdAt: "2024-03-01T14:22:00Z"
+
+    AdoptionRequestInputExample:
+      value:
+        adopterName: Jane Smith
+        adopterEmail: jane.smith@example.com
+        adopterPhone: "+441987654321"
+        message: I would love to give Buddy a forever home. I have a large garden and lots of experience with Labradors.
+        hasGarden: true
+        otherPets: One cat, very calm.
