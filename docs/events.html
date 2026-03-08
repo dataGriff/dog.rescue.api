@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Events Reference — Dog Rescue Adoption API</title>
+  <meta name="description" content="AsyncAPI event reference for the Dog Rescue Adoption platform — all domain events published over AMQP." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="asyncapi-default.min.css" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Inter', sans-serif; }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 200;
+      background: rgba(255,255,255,.95);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid #e2e8f0;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      padding: 0 24px;
+      gap: 16px;
+    }
+    .topbar-logo {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 700;
+      font-size: 1rem;
+      color: #1e293b;
+      text-decoration: none;
+    }
+    .topbar-logo .paw { font-size: 1.2rem; }
+    .topbar-divider { color: #cbd5e1; }
+    .topbar-title { color: #64748b; font-size: .9rem; font-weight: 500; }
+    .topbar-nav {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .topbar-link {
+      text-decoration: none;
+      font-size: .85rem;
+      font-weight: 500;
+      color: #64748b;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      padding: 6px 12px;
+      border-radius: 6px;
+      transition: background .15s, color .15s;
+    }
+    .topbar-link:hover { background: #f1f5f9; color: #1e293b; }
+
+    #asyncapi-container { height: calc(100vh - 56px); overflow: auto; }
+
+    /* Override AsyncAPI component accent colour to match site theme */
+    .asyncapi__info-header { background: #fffbeb !important; border-color: #fde68a !important; }
+    .asyncapi__channel-header { background: #fffbeb !important; }
+  </style>
+</head>
+<body>
+  <div class="topbar">
+    <a href="index.html" class="topbar-logo">
+      <span class="paw">🐾</span>
+      Dog Rescue API
+    </a>
+    <span class="topbar-divider">/</span>
+    <span class="topbar-title">Events Reference</span>
+    <div class="topbar-nav">
+      <a href="api.html" class="topbar-link">📖 REST API</a>
+      <a href="index.html" class="topbar-link">← Back to overview</a>
+    </div>
+  </div>
+
+  <div id="asyncapi-container"></div>
+
+  <script src="asyncapi-standalone.js"></script>
+  <script>
+    AsyncApiStandalone.render(
+      {
+        schema: { url: 'asyncapi.yaml' },
+        config: {
+          show: {
+            sidebar: true,
+            info: true,
+            servers: true,
+            operations: true,
+            messages: true,
+            schemas: true,
+            errors: true
+          },
+          sidebar: {
+            showServers: 'byDefault',
+            showOperations: 'byDefault'
+          }
+        }
+      },
+      document.getElementById('asyncapi-container')
+    );
+  </script>
+</body>
+</html>

@@ -576,6 +576,7 @@
     <div class="nav-links">
       <a href="#features">Features</a>
       <a href="#endpoints">Endpoints</a>
+      <a href="#events">Events</a>
       <a href="#quickstart">Quick Start</a>
       <a href="api.html" class="btn-primary btn">API Reference</a>
     </div>
@@ -584,20 +585,25 @@
 
 <!-- ─── Hero ───────────────────────────────────────────────────────── -->
 <section class="hero">
-  <div class="hero-badge">🐶 OpenAPI 3.0 · Mock-ready · Multi-rescue</div>
+  <div class="hero-badge">🐶 OpenAPI 3.0 · AsyncAPI 2.6 · Mock-ready · Multi-rescue</div>
   <h1>The <span>Dog Rescue</span><br/>Adoption API</h1>
   <p>
     Connect rescue organisations and adopters on a single, open platform.
-    Add dogs, browse across every rescue, and submit adoption requests — all through a documented REST API.
+    Add dogs, browse across every rescue, and submit adoption requests — all through a documented REST API
+    with real-time domain events.
   </p>
   <div class="hero-actions">
     <a href="api.html" class="btn btn-amber btn-lg">📖 View API Reference</a>
-    <a href="#quickstart" class="btn btn-outline btn-lg">⚡ Quick Start</a>
+    <a href="events.html" class="btn btn-outline btn-lg">⚡ View Events Reference</a>
   </div>
   <div class="hero-stats">
     <div class="stat">
       <span class="stat-num">10</span>
       <span class="stat-label">Endpoints</span>
+    </div>
+    <div class="stat">
+      <span class="stat-num">5</span>
+      <span class="stat-label">Events</span>
     </div>
     <div class="stat">
       <span class="stat-num">3</span>
@@ -606,6 +612,10 @@
     <div class="stat">
       <span class="stat-num">OAS3</span>
       <span class="stat-label">Standard</span>
+    </div>
+    <div class="stat">
+      <span class="stat-num">AsyncAPI</span>
+      <span class="stat-label">Events Spec</span>
     </div>
     <div class="stat">
       <span class="stat-num">Mock</span>
@@ -650,6 +660,11 @@
         <div class="feature-icon">📄</div>
         <h3>OpenAPI 3.0.3 spec</h3>
         <p>Fully documented contract with rich schemas, inline examples, reusable components, and pagination support.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">📡</div>
+        <h3>AsyncAPI 2.6 events spec</h3>
+        <p>Every key action publishes a domain event over AMQP. Rescue registered, dog listed, adoption requested — all documented as first-class events.</p>
       </div>
     </div>
   </div>
@@ -773,6 +788,108 @@
         </div>
       </div>
 
+    </div>
+  </div>
+</section>
+
+<!-- ─── Events ─────────────────────────────────────────────────────── -->
+<section id="events" style="background: var(--muted);">
+  <div class="container">
+    <p class="section-label">Domain Events</p>
+    <h2>Real-time events over AMQP</h2>
+    <p class="section-intro">Every meaningful state change publishes a domain event. Subscribe to build notifications, search indexes, analytics, and integrations without polling the REST API.</p>
+
+    <div class="endpoints-grid" style="margin-bottom: 32px;">
+
+      <div class="endpoint-group">
+        <div class="endpoint-group-header">
+          <span class="group-icon">🏠</span>
+          <div>
+            <h3>Rescue events</h3>
+            <p>Rescue organisation lifecycle</p>
+          </div>
+        </div>
+        <div class="endpoint-list">
+          <div class="endpoint-item">
+            <span class="method method-post" style="background:#e0f2fe;color:#0369a1;min-width:64px;">PUB</span>
+            <span class="endpoint-path">rescue.registered</span>
+            <span class="endpoint-desc">New rescue registered</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="endpoint-group">
+        <div class="endpoint-group-header">
+          <span class="group-icon">🐕</span>
+          <div>
+            <h3>Dog events</h3>
+            <p>Dog listing and status changes</p>
+          </div>
+        </div>
+        <div class="endpoint-list">
+          <div class="endpoint-item">
+            <span class="method method-post" style="background:#e0f2fe;color:#0369a1;min-width:64px;">PUB</span>
+            <span class="endpoint-path">dog.listed</span>
+            <span class="endpoint-desc">New dog listed</span>
+          </div>
+          <div class="endpoint-item">
+            <span class="method method-post" style="background:#e0f2fe;color:#0369a1;min-width:64px;">PUB</span>
+            <span class="endpoint-path">dog.updated</span>
+            <span class="endpoint-desc">Dog profile or status updated</span>
+          </div>
+          <div class="endpoint-item">
+            <span class="method method-post" style="background:#e0f2fe;color:#0369a1;min-width:64px;">PUB</span>
+            <span class="endpoint-path">dog.removed</span>
+            <span class="endpoint-desc">Dog removed from platform</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="endpoint-group">
+        <div class="endpoint-group-header">
+          <span class="group-icon">💌</span>
+          <div>
+            <h3>Adoption events</h3>
+            <p>Adoption request submission</p>
+          </div>
+        </div>
+        <div class="endpoint-list">
+          <div class="endpoint-item">
+            <span class="method method-post" style="background:#e0f2fe;color:#0369a1;min-width:64px;">PUB</span>
+            <span class="endpoint-path">adoption.requested</span>
+            <span class="endpoint-desc">Adoption request submitted</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="endpoint-group">
+        <div class="endpoint-group-header">
+          <span class="group-icon">✉️</span>
+          <div>
+            <h3>Message envelope</h3>
+            <p>Standard fields on every event</p>
+          </div>
+        </div>
+        <div style="padding: 8px 0;">
+          <table class="filter-table">
+            <thead>
+              <tr><th>Field</th><th>Description</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><code>metadata.eventId</code></td><td>UUID — for deduplication</td></tr>
+              <tr><td><code>metadata.eventType</code></td><td>Mirrors the channel name</td></tr>
+              <tr><td><code>metadata.source</code></td><td>Producing service name</td></tr>
+              <tr><td><code>metadata.timestamp</code></td><td>ISO-8601 event time</td></tr>
+              <tr><td><code>metadata.version</code></td><td>Schema version string</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+
+    <div style="text-align:center;">
+      <a href="events.html" class="btn btn-amber">📡 View Full Events Reference</a>
     </div>
   </div>
 </section>
@@ -1056,10 +1173,10 @@
 <section class="cta-section">
   <div class="container">
     <h2>Ready to explore the full spec?</h2>
-    <p>Browse every endpoint, schema, and example in the interactive API reference.</p>
+    <p>Browse every endpoint, event, schema, and example in the interactive API and Events references.</p>
     <div class="hero-actions">
       <a href="api.html" class="btn btn-white btn-lg">📖 Open API Reference</a>
-      <a href="https://github.com/dataGriff/dog.rescue.api" class="btn btn-dark btn-lg" target="_blank" rel="noopener">⭐ View on GitHub</a>
+      <a href="events.html" class="btn btn-dark btn-lg">📡 Open Events Reference</a>
     </div>
   </div>
 </section>
@@ -1069,8 +1186,9 @@
   <div class="footer-inner">
     <p class="footer-logo">🐾 Dog Rescue Adoption API</p>
     <p>
-      OpenAPI 3.0.3 contract &middot;
+      OpenAPI 3.0.3 &middot; AsyncAPI 2.6 &middot;
       <a href="openapi.yaml" target="_blank">openapi.yaml</a> &middot;
+      <a href="asyncapi.yaml" target="_blank">asyncapi.yaml</a> &middot;
       <a href="https://github.com/dataGriff/dog.rescue.api" target="_blank" rel="noopener">GitHub</a>
     </p>
   </div>
