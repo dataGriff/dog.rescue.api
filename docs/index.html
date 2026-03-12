@@ -602,7 +602,7 @@
       <span class="stat-label">Endpoints</span>
     </div>
     <div class="stat">
-      <span class="stat-num">5</span>
+      <span class="stat-num" id="events-count">…</span>
       <span class="stat-label">Events</span>
     </div>
     <div class="stat">
@@ -799,93 +799,8 @@
     <h2>Real-time events over AMQP</h2>
     <p class="section-intro">Every meaningful state change publishes a domain event. Subscribe to build notifications, search indexes, analytics, and integrations without polling the REST API.</p>
 
-    <div class="endpoints-grid" style="margin-bottom: 32px;">
-
-      <div class="endpoint-group">
-        <div class="endpoint-group-header">
-          <span class="group-icon">🏠</span>
-          <div>
-            <h3>Rescue events</h3>
-            <p>Rescue organisation lifecycle</p>
-          </div>
-        </div>
-        <div class="endpoint-list">
-          <div class="endpoint-item">
-            <span class="method method-post" style="background:#e0f2fe;color:#0369a1;min-width:64px;">PUB</span>
-            <span class="endpoint-path">rescue.registered</span>
-            <span class="endpoint-desc">New rescue registered</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="endpoint-group">
-        <div class="endpoint-group-header">
-          <span class="group-icon">🐕</span>
-          <div>
-            <h3>Dog events</h3>
-            <p>Dog listing and status changes</p>
-          </div>
-        </div>
-        <div class="endpoint-list">
-          <div class="endpoint-item">
-            <span class="method method-post" style="background:#e0f2fe;color:#0369a1;min-width:64px;">PUB</span>
-            <span class="endpoint-path">dog.listed</span>
-            <span class="endpoint-desc">New dog listed</span>
-          </div>
-          <div class="endpoint-item">
-            <span class="method method-post" style="background:#e0f2fe;color:#0369a1;min-width:64px;">PUB</span>
-            <span class="endpoint-path">dog.updated</span>
-            <span class="endpoint-desc">Dog profile or status updated</span>
-          </div>
-          <div class="endpoint-item">
-            <span class="method method-post" style="background:#e0f2fe;color:#0369a1;min-width:64px;">PUB</span>
-            <span class="endpoint-path">dog.removed</span>
-            <span class="endpoint-desc">Dog removed from platform</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="endpoint-group">
-        <div class="endpoint-group-header">
-          <span class="group-icon">💌</span>
-          <div>
-            <h3>Adoption events</h3>
-            <p>Adoption request submission</p>
-          </div>
-        </div>
-        <div class="endpoint-list">
-          <div class="endpoint-item">
-            <span class="method method-post" style="background:#e0f2fe;color:#0369a1;min-width:64px;">PUB</span>
-            <span class="endpoint-path">adoption.requested</span>
-            <span class="endpoint-desc">Adoption request submitted</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="endpoint-group">
-        <div class="endpoint-group-header">
-          <span class="group-icon">✉️</span>
-          <div>
-            <h3>Message envelope</h3>
-            <p>Standard fields on every event</p>
-          </div>
-        </div>
-        <div style="padding: 8px 0;">
-          <table class="filter-table">
-            <thead>
-              <tr><th>Field</th><th>Description</th></tr>
-            </thead>
-            <tbody>
-              <tr><td><code>metadata.eventId</code></td><td>UUID — for deduplication</td></tr>
-              <tr><td><code>metadata.eventType</code></td><td>Mirrors the channel name</td></tr>
-              <tr><td><code>metadata.source</code></td><td>Producing service name</td></tr>
-              <tr><td><code>metadata.timestamp</code></td><td>ISO-8601 event time</td></tr>
-              <tr><td><code>metadata.version</code></td><td>Schema version string</td></tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-
+    <div id="events-grid" class="endpoints-grid" style="margin-bottom: 32px;">
+      <!-- Auto-generated from asyncapi.yaml at page load -->
     </div>
 
     <div style="text-align:center;">
@@ -1201,6 +1116,93 @@
     document.getElementById(id).classList.add('active');
     btn.classList.add('active');
   }
+</script>
+<script src="js-yaml.min.js"></script>
+<script>
+  /* ─── Auto-generate Domain Events section from asyncapi.yaml ──────── */
+  (async function renderEventsSection() {
+    const TAG_ICONS = { Rescues: '🏠', Dogs: '🐕', Adoptions: '💌' };
+    const DEFAULT_ICON = '📋';
+
+    try {
+      const resp = await fetch('asyncapi.yaml');
+      if (!resp.ok) throw new Error('Failed to fetch asyncapi.yaml');
+      const spec = jsyaml.load(await resp.text());
+
+      const channels  = spec.channels  || {};
+      const topTags   = spec.tags       || [];
+      const schemas   = (spec.components && spec.components.schemas) || {};
+
+      /* -- Update Events count stat ----------------------------------- */
+      const countEl = document.getElementById('events-count');
+      if (countEl) countEl.textContent = Object.keys(channels).length;
+
+      /* -- Build tag map (preserving top-level tag order) ------------- */
+      const tagMap = {};
+      for (const t of topTags) {
+        tagMap[t.name] = { description: t.description, channels: [] };
+      }
+      for (const [chName, chDef] of Object.entries(channels)) {
+        const op      = chDef.subscribe || chDef.publish || {};
+        const tagName = (op.tags && op.tags[0] && op.tags[0].name) || 'Other';
+        if (!tagMap[tagName]) tagMap[tagName] = { description: '', channels: [] };
+        tagMap[tagName].channels.push({ name: chName, summary: op.summary || '' });
+      }
+
+      /* -- Render channel-group cards --------------------------------- */
+      let cardsHtml = '';
+      for (const [tagName, tagData] of Object.entries(tagMap)) {
+        if (!tagData.channels.length) continue;
+        const icon  = TAG_ICONS[tagName] || DEFAULT_ICON;
+        const items = tagData.channels.map(ch => `
+          <div class="endpoint-item">
+            <span class="method method-post" style="background:#e0f2fe;color:#0369a1;min-width:64px;">PUB</span>
+            <span class="endpoint-path">${ch.name}</span>
+            <span class="endpoint-desc">${ch.summary}</span>
+          </div>`).join('');
+        cardsHtml += `
+          <div class="endpoint-group">
+            <div class="endpoint-group-header">
+              <span class="group-icon">${icon}</span>
+              <div>
+                <h3>${tagName} events</h3>
+                <p>${tagData.description}</p>
+              </div>
+            </div>
+            <div class="endpoint-list">${items}</div>
+          </div>`;
+      }
+
+      /* -- Render message envelope card from MessageHeaders schema ---- */
+      const msgHeaders = schemas.MessageHeaders && schemas.MessageHeaders.properties
+        ? schemas.MessageHeaders.properties : {};
+      const envRows = Object.entries(msgHeaders).map(([field, def]) => {
+        const desc = (def.description || '').split('.')[0];
+        return `<tr><td><code>metadata.${field}</code></td><td>${desc}</td></tr>`;
+      }).join('');
+
+      cardsHtml += `
+        <div class="endpoint-group">
+          <div class="endpoint-group-header">
+            <span class="group-icon">✉️</span>
+            <div>
+              <h3>Message envelope</h3>
+              <p>Standard fields on every event</p>
+            </div>
+          </div>
+          <div style="padding: 8px 0;">
+            <table class="filter-table">
+              <thead><tr><th>Field</th><th>Description</th></tr></thead>
+              <tbody>${envRows}</tbody>
+            </table>
+          </div>
+        </div>`;
+
+      document.getElementById('events-grid').innerHTML = cardsHtml;
+    } catch (err) {
+      console.error('Could not render events section:', err);
+    }
+  })();
 </script>
 </body>
 </html>
