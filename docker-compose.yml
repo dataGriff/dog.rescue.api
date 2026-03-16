@@ -1,5 +1,4 @@
 services:
-services:
   # Custom docs website – landing page + Redoc API reference
   docs:
     image: nginx:alpine
@@ -8,6 +7,7 @@ services:
     volumes:
       - ./docs:/usr/share/nginx/html:ro
       - ./openapi.yaml:/api/openapi.yaml:ro
+      - ./asyncapi.yaml:/api/asyncapi.yaml:ro
       - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
     depends_on:
       - mock

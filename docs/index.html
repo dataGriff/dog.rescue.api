@@ -576,6 +576,7 @@
     <div class="nav-links">
       <a href="#features">Features</a>
       <a href="#endpoints">Endpoints</a>
+      <a href="#events">Events</a>
       <a href="#quickstart">Quick Start</a>
       <a href="api.html" class="btn-primary btn">API Reference</a>
     </div>
@@ -584,20 +585,25 @@
 
 <!-- ─── Hero ───────────────────────────────────────────────────────── -->
 <section class="hero">
-  <div class="hero-badge">🐶 OpenAPI 3.0 · Mock-ready · Multi-rescue</div>
+  <div class="hero-badge">🐶 OpenAPI 3.0 · AsyncAPI 2.6 · Mock-ready · Multi-rescue</div>
   <h1>The <span>Dog Rescue</span><br/>Adoption API</h1>
   <p>
     Connect rescue organisations and adopters on a single, open platform.
-    Add dogs, browse across every rescue, and submit adoption requests — all through a documented REST API.
+    Add dogs, browse across every rescue, and submit adoption requests — all through a documented REST API
+    with real-time domain events.
   </p>
   <div class="hero-actions">
     <a href="api.html" class="btn btn-amber btn-lg">📖 View API Reference</a>
-    <a href="#quickstart" class="btn btn-outline btn-lg">⚡ Quick Start</a>
+    <a href="events.html" class="btn btn-outline btn-lg">⚡ View Events Reference</a>
   </div>
   <div class="hero-stats">
     <div class="stat">
       <span class="stat-num">10</span>
       <span class="stat-label">Endpoints</span>
+    </div>
+    <div class="stat">
+      <span class="stat-num" id="events-count">…</span>
+      <span class="stat-label">Events</span>
     </div>
     <div class="stat">
       <span class="stat-num">3</span>
@@ -606,6 +612,10 @@
     <div class="stat">
       <span class="stat-num">OAS3</span>
       <span class="stat-label">Standard</span>
+    </div>
+    <div class="stat">
+      <span class="stat-num">AsyncAPI</span>
+      <span class="stat-label">Events Spec</span>
     </div>
     <div class="stat">
       <span class="stat-num">Mock</span>
@@ -650,6 +660,11 @@
         <div class="feature-icon">📄</div>
         <h3>OpenAPI 3.0.3 spec</h3>
         <p>Fully documented contract with rich schemas, inline examples, reusable components, and pagination support.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">📡</div>
+        <h3>AsyncAPI 2.6 events spec</h3>
+        <p>Every key action publishes a domain event over AMQP. Rescue registered, dog listed, adoption requested — all documented as first-class events.</p>
       </div>
     </div>
   </div>
@@ -773,6 +788,23 @@
         </div>
       </div>
 
+    </div>
+  </div>
+</section>
+
+<!-- ─── Events ─────────────────────────────────────────────────────── -->
+<section id="events" style="background: var(--muted);">
+  <div class="container">
+    <p class="section-label">Domain Events</p>
+    <h2>Real-time events over AMQP</h2>
+    <p class="section-intro">Every meaningful state change publishes a domain event. Subscribe to build notifications, search indexes, analytics, and integrations without polling the REST API.</p>
+
+    <div id="events-grid" class="endpoints-grid" style="margin-bottom: 32px;">
+      <!-- Auto-generated from asyncapi.yaml at page load -->
+    </div>
+
+    <div style="text-align:center;">
+      <a href="events.html" class="btn btn-amber">📡 View Full Events Reference</a>
     </div>
   </div>
 </section>
@@ -1056,10 +1088,10 @@
 <section class="cta-section">
   <div class="container">
     <h2>Ready to explore the full spec?</h2>
-    <p>Browse every endpoint, schema, and example in the interactive API reference.</p>
+    <p>Browse every endpoint, event, schema, and example in the interactive API and Events references.</p>
     <div class="hero-actions">
       <a href="api.html" class="btn btn-white btn-lg">📖 Open API Reference</a>
-      <a href="https://github.com/dataGriff/dog.rescue.api" class="btn btn-dark btn-lg" target="_blank" rel="noopener">⭐ View on GitHub</a>
+      <a href="events.html" class="btn btn-dark btn-lg">📡 Open Events Reference</a>
     </div>
   </div>
 </section>
@@ -1069,8 +1101,9 @@
   <div class="footer-inner">
     <p class="footer-logo">🐾 Dog Rescue Adoption API</p>
     <p>
-      OpenAPI 3.0.3 contract &middot;
+      OpenAPI 3.0.3 &middot; AsyncAPI 2.6 &middot;
       <a href="openapi.yaml" target="_blank">openapi.yaml</a> &middot;
+      <a href="asyncapi.yaml" target="_blank">asyncapi.yaml</a> &middot;
       <a href="https://github.com/dataGriff/dog.rescue.api" target="_blank" rel="noopener">GitHub</a>
     </p>
   </div>
@@ -1083,6 +1116,93 @@
     document.getElementById(id).classList.add('active');
     btn.classList.add('active');
   }
+</script>
+<script src="js-yaml.min.js"></script>
+<script>
+  /* ─── Auto-generate Domain Events section from asyncapi.yaml ──────── */
+  (async function renderEventsSection() {
+    const TAG_ICONS = { Rescues: '🏠', Dogs: '🐕', Adoptions: '💌' };
+    const DEFAULT_ICON = '📋';
+
+    try {
+      const resp = await fetch('asyncapi.yaml');
+      if (!resp.ok) throw new Error('Failed to fetch asyncapi.yaml');
+      const spec = jsyaml.load(await resp.text());
+
+      const channels  = spec.channels  || {};
+      const topTags   = spec.tags       || [];
+      const schemas   = (spec.components && spec.components.schemas) || {};
+
+      /* -- Update Events count stat ----------------------------------- */
+      const countEl = document.getElementById('events-count');
+      if (countEl) countEl.textContent = Object.keys(channels).length;
+
+      /* -- Build tag map (preserving top-level tag order) ------------- */
+      const tagMap = {};
+      for (const t of topTags) {
+        tagMap[t.name] = { description: t.description, channels: [] };
+      }
+      for (const [chName, chDef] of Object.entries(channels)) {
+        const op      = chDef.subscribe || chDef.publish || {};
+        const tagName = (op.tags && op.tags[0] && op.tags[0].name) || 'Other';
+        if (!tagMap[tagName]) tagMap[tagName] = { description: '', channels: [] };
+        tagMap[tagName].channels.push({ name: chName, summary: op.summary || '' });
+      }
+
+      /* -- Render channel-group cards --------------------------------- */
+      let cardsHtml = '';
+      for (const [tagName, tagData] of Object.entries(tagMap)) {
+        if (!tagData.channels.length) continue;
+        const icon  = TAG_ICONS[tagName] || DEFAULT_ICON;
+        const items = tagData.channels.map(ch => `
+          <div class="endpoint-item">
+            <span class="method method-post" style="background:#e0f2fe;color:#0369a1;min-width:64px;">PUB</span>
+            <span class="endpoint-path">${ch.name}</span>
+            <span class="endpoint-desc">${ch.summary}</span>
+          </div>`).join('');
+        cardsHtml += `
+          <div class="endpoint-group">
+            <div class="endpoint-group-header">
+              <span class="group-icon">${icon}</span>
+              <div>
+                <h3>${tagName} events</h3>
+                <p>${tagData.description}</p>
+              </div>
+            </div>
+            <div class="endpoint-list">${items}</div>
+          </div>`;
+      }
+
+      /* -- Render message envelope card from MessageHeaders schema ---- */
+      const msgHeaders = schemas.MessageHeaders && schemas.MessageHeaders.properties
+        ? schemas.MessageHeaders.properties : {};
+      const envRows = Object.entries(msgHeaders).map(([field, def]) => {
+        const desc = (def.description || '').split('.')[0];
+        return `<tr><td><code>metadata.${field}</code></td><td>${desc}</td></tr>`;
+      }).join('');
+
+      cardsHtml += `
+        <div class="endpoint-group">
+          <div class="endpoint-group-header">
+            <span class="group-icon">✉️</span>
+            <div>
+              <h3>Message envelope</h3>
+              <p>Standard fields on every event</p>
+            </div>
+          </div>
+          <div style="padding: 8px 0;">
+            <table class="filter-table">
+              <thead><tr><th>Field</th><th>Description</th></tr></thead>
+              <tbody>${envRows}</tbody>
+            </table>
+          </div>
+        </div>`;
+
+      document.getElementById('events-grid').innerHTML = cardsHtml;
+    } catch (err) {
+      console.error('Could not render events section:', err);
+    }
+  })();
 </script>
 </body>
 </html>
