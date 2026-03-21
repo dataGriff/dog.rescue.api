@@ -4,6 +4,33 @@ An [OpenAPI 3.0](https://spec.openapis.org/oas/v3.0.3) contract for a multi-resc
 
 Rescue organisations can register themselves and add dogs available for adoption. Potential adopters can browse and filter dogs across all rescues and submit adoption requests.
 
+## Domain Model
+
+The platform is built around three core entities: **Rescue Organisations**, **Dogs**, and **Adoption Requests**.
+
+```
+Rescue  1 ──< Dogs  1 ──< Adoption Requests
+```
+
+A Rescue lists Dogs. Each Dog moves through a status lifecycle (`available → reserved → adopted`).
+Adopters submit Adoption Requests against a Dog when its status is `available`.
+
+See [`docs/domain-model.md`](./docs/domain-model.md) for the full entity descriptions, ER diagram, and Dog status state machine.
+
+## Business Processes
+
+Five end-to-end processes drive the platform:
+
+1. **Rescue Registration** — a rescue signs up and receives a `rescueId`
+2. **Dog Listing** — a rescue adds a dog, which becomes immediately discoverable
+3. **Browse Dogs** — an adopter searches and filters dogs across all rescues
+4. **Adoption Request** — an adopter submits a request; the dog moves to `reserved`
+5. **Dog Update / Removal** — a rescue updates or removes a dog listing
+
+Each process that writes data also publishes a domain event so downstream systems can react without polling the REST API.
+
+See [`docs/business-processes.md`](./docs/business-processes.md) for sequence diagrams of each process.
+
 ## API Contract
 
 The full API specification is defined in [`openapi.yaml`](./openapi.yaml).

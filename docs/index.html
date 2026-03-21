@@ -243,6 +243,157 @@
     .feature-card h3 { font-size: 1.05rem; font-weight: 700; color: var(--slate); margin-bottom: 8px; }
     .feature-card p { font-size: .9rem; color: var(--slate-light); line-height: 1.6; }
 
+    /* ─── Domain model + Business processes ─────────────────────────── */
+    .entity-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+      margin-bottom: 40px;
+    }
+    .entity-card {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+    }
+    .entity-card-header {
+      padding: 16px 20px;
+      background: var(--amber-light);
+      border-bottom: 1px solid #fde68a;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .entity-card-header .entity-icon { font-size: 1.3rem; }
+    .entity-card-header h3 { font-size: 1rem; font-weight: 700; color: var(--brown); }
+    .entity-card-header p { font-size: .8rem; color: var(--amber-dark); margin-top: 2px; }
+    .entity-fields { padding: 8px 0; }
+    .entity-field {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 20px;
+      border-bottom: 1px solid var(--border);
+      font-size: .83rem;
+    }
+    .entity-field:last-child { border-bottom: none; }
+    .entity-field code {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: .78rem;
+      background: #f1f5f9;
+      padding: 2px 6px;
+      border-radius: 4px;
+      color: var(--slate-mid);
+      min-width: 130px;
+    }
+    .entity-field span { color: var(--slate-light); }
+    .rel-box {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px 28px;
+      box-shadow: var(--shadow-sm);
+      font-size: .9rem;
+      color: var(--slate-mid);
+      line-height: 1.7;
+    }
+    .rel-box code {
+      font-family: 'JetBrains Mono', monospace;
+      background: #f1f5f9;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: .82rem;
+      color: var(--slate);
+    }
+    .status-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 16px;
+    }
+    .status-pill {
+      padding: 4px 14px;
+      border-radius: 999px;
+      font-size: .78rem;
+      font-weight: 600;
+    }
+    .status-available   { background: #dcfce7; color: #15803d; }
+    .status-reserved    { background: #fef3c7; color: #b45309; }
+    .status-adopted     { background: #dbeafe; color: #1d4ed8; }
+    .status-unavailable { background: #f1f5f9; color: #64748b; }
+    .process-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+    }
+    .process-card {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+    }
+    .process-card-header {
+      padding: 16px 20px;
+      background: var(--muted);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .process-card-header .process-icon { font-size: 1.3rem; }
+    .process-card-header h3 { font-size: .95rem; font-weight: 700; color: var(--slate); }
+    .process-card-header p { font-size: .8rem; color: var(--slate-light); margin-top: 2px; }
+    .process-steps { padding: 16px 20px; list-style: none; counter-reset: step; }
+    .process-steps li {
+      counter-increment: step;
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 8px 0;
+      border-bottom: 1px solid var(--border);
+      font-size: .85rem;
+      color: var(--slate-mid);
+    }
+    .process-steps li:last-child { border-bottom: none; }
+    .process-steps li::before {
+      content: counter(step);
+      background: var(--amber-light);
+      color: var(--amber-dark);
+      font-size: .75rem;
+      font-weight: 700;
+      min-width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+    .process-steps li code {
+      font-family: 'JetBrains Mono', monospace;
+      background: #f1f5f9;
+      padding: 1px 5px;
+      border-radius: 4px;
+      font-size: .78rem;
+      color: var(--slate);
+    }
+    .event-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: #e0f2fe;
+      color: #0369a1;
+      font-size: .73rem;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-family: 'JetBrains Mono', monospace;
+      white-space: nowrap;
+    }
+
     /* ─── Endpoints ─────────────────────────────────────────────────── */
     .endpoints-grid {
       display: grid;
@@ -575,6 +726,8 @@
     </a>
     <div class="nav-links">
       <a href="#features">Features</a>
+      <a href="#domain">Domain</a>
+      <a href="#processes">Processes</a>
       <a href="#endpoints">Endpoints</a>
       <a href="#events">Events</a>
       <a href="#quickstart">Quick Start</a>
@@ -665,6 +818,199 @@
         <div class="feature-icon">📡</div>
         <h3>AsyncAPI 2.6 events spec</h3>
         <p>Every key action publishes a domain event over AMQP. Rescue registered, dog listed, adoption requested — all documented as first-class events.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── Domain Model ──────────────────────────────────────────────── -->
+<section id="domain" style="background: var(--muted);">
+  <div class="container">
+    <p class="section-label">Domain Model</p>
+    <h2>Three core entities</h2>
+    <p class="section-intro">Before reading the contracts, understand the building blocks: rescues list dogs, and adopters submit requests against those dogs.</p>
+
+    <div class="entity-grid">
+      <!-- Rescue -->
+      <div class="entity-card">
+        <div class="entity-card-header">
+          <span class="entity-icon">🏠</span>
+          <div>
+            <h3>Rescue Organisation</h3>
+            <p>Registers and manages dogs on the platform</p>
+          </div>
+        </div>
+        <div class="entity-fields">
+          <div class="entity-field"><code>rescueId</code>     <span>Unique identifier (UUID)</span></div>
+          <div class="entity-field"><code>name</code>         <span>Rescue organisation name</span></div>
+          <div class="entity-field"><code>email</code>        <span>Contact email</span></div>
+          <div class="entity-field"><code>phone</code>        <span>Contact phone</span></div>
+          <div class="entity-field"><code>address</code>      <span>Physical address</span></div>
+          <div class="entity-field"><code>registeredAt</code> <span>ISO-8601 registration timestamp</span></div>
+        </div>
+      </div>
+
+      <!-- Dog -->
+      <div class="entity-card">
+        <div class="entity-card-header">
+          <span class="entity-icon">🐕</span>
+          <div>
+            <h3>Dog</h3>
+            <p>Listed by a rescue, browsable by adopters</p>
+          </div>
+        </div>
+        <div class="entity-fields">
+          <div class="entity-field"><code>dogId</code>    <span>Unique identifier (UUID)</span></div>
+          <div class="entity-field"><code>rescueId</code> <span>Owning rescue (FK)</span></div>
+          <div class="entity-field"><code>name</code>     <span>Dog's name</span></div>
+          <div class="entity-field"><code>breed</code>    <span>Breed (e.g. Labrador)</span></div>
+          <div class="entity-field"><code>ageYears</code> <span>Age in whole years</span></div>
+          <div class="entity-field"><code>sex</code>      <span><code>male</code> or <code>female</code></span></div>
+          <div class="entity-field"><code>status</code>   <span>Adoption status (see below)</span></div>
+          <div class="entity-field"><code>listedAt</code> <span>ISO-8601 listing timestamp</span></div>
+        </div>
+      </div>
+
+      <!-- Adoption Request -->
+      <div class="entity-card">
+        <div class="entity-card-header">
+          <span class="entity-icon">💌</span>
+          <div>
+            <h3>Adoption Request</h3>
+            <p>Submitted by a prospective adopter</p>
+          </div>
+        </div>
+        <div class="entity-fields">
+          <div class="entity-field"><code>adoptionId</code>    <span>Unique identifier (UUID)</span></div>
+          <div class="entity-field"><code>dogId</code>         <span>Target dog (FK)</span></div>
+          <div class="entity-field"><code>adopterName</code>   <span>Adopter's full name</span></div>
+          <div class="entity-field"><code>adopterEmail</code>  <span>Adopter's email address</span></div>
+          <div class="entity-field"><code>adopterPhone</code>  <span>Adopter's phone number</span></div>
+          <div class="entity-field"><code>message</code>       <span>Optional message to the rescue</span></div>
+          <div class="entity-field"><code>submittedAt</code>   <span>ISO-8601 submission timestamp</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Relationships + Dog status -->
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:20px;">
+      <div class="rel-box">
+        <strong>Relationships</strong><br/>
+        A <strong>Rescue</strong> lists zero or more <strong>Dogs</strong>.<br/>
+        A <strong>Dog</strong> belongs to exactly one <strong>Rescue</strong> and can receive zero or more <strong>Adoption Requests</strong>.<br/>
+        An <strong>Adoption Request</strong> is linked to exactly one <strong>Dog</strong>.<br/><br/>
+        <code>Rescue 1 ──&lt; Dogs 1 ──&lt; Adoption Requests</code>
+      </div>
+      <div class="rel-box">
+        <strong>Dog status lifecycle</strong><br/>
+        A dog's <code>status</code> field drives what actions are permitted:
+        <div class="status-pills">
+          <span class="status-pill status-available">available</span>
+          <span style="align-self:center;color:var(--slate-light);font-size:.8rem;">→</span>
+          <span class="status-pill status-reserved">reserved</span>
+          <span style="align-self:center;color:var(--slate-light);font-size:.8rem;">→</span>
+          <span class="status-pill status-adopted">adopted</span>
+        </div>
+        <div style="margin-top:10px;font-size:.82rem;color:var(--slate-light);">
+          Rescues can also mark a dog as <span class="status-pill status-unavailable">unavailable</span> at any point.
+          An adoption request moves a dog from <em>available</em> to <em>reserved</em>.
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── Business Processes ────────────────────────────────────────── -->
+<section id="processes">
+  <div class="container">
+    <p class="section-label">Business Processes</p>
+    <h2>Five main processes end-to-end</h2>
+    <p class="section-intro">Five processes drive the platform. Each write operation calls the REST API and triggers a domain event for downstream consumers.</p>
+
+    <div class="process-grid">
+      <!-- Rescue Registration -->
+      <div class="process-card">
+        <div class="process-card-header">
+          <span class="process-icon">🏠</span>
+          <div>
+            <h3>Rescue Registration</h3>
+            <p>A rescue joins the platform</p>
+          </div>
+        </div>
+        <ol class="process-steps">
+          <li>Rescue submits name, email, phone, and address to <code>POST /rescues</code></li>
+          <li>Platform assigns a unique <code>rescueId</code> and returns it with a <code>201 Created</code></li>
+          <li>Platform publishes <span class="event-badge">rescue.registered</span> event to the message broker</li>
+          <li>Downstream services (welcome email, analytics) react to the event without polling</li>
+        </ol>
+      </div>
+
+      <!-- Dog Listing -->
+      <div class="process-card">
+        <div class="process-card-header">
+          <span class="process-icon">🐕</span>
+          <div>
+            <h3>Dog Listing</h3>
+            <p>A rescue adds a dog to the platform</p>
+          </div>
+        </div>
+        <ol class="process-steps">
+          <li>Rescue sends dog details (name, breed, age, sex) to <code>POST /rescues/{rescueId}/dogs</code></li>
+          <li>Platform creates the dog with <code>status: available</code> and returns a <code>dogId</code></li>
+          <li>Dog is immediately visible in <code>GET /dogs</code> browse results</li>
+          <li>Platform publishes <span class="event-badge">dog.listed</span> event to update search indexes</li>
+        </ol>
+      </div>
+
+      <!-- Browse Dogs -->
+      <div class="process-card">
+        <div class="process-card-header">
+          <span class="process-icon">🔍</span>
+          <div>
+            <h3>Browse Dogs</h3>
+            <p>An adopter searches for a suitable dog</p>
+          </div>
+        </div>
+        <ol class="process-steps">
+          <li>Adopter calls <code>GET /dogs?breed=…&amp;status=available</code> with optional filters</li>
+          <li>Platform returns a paginated list of matching dogs across all rescues</li>
+          <li>Adopter views full details of a candidate via <code>GET /dogs/{dogId}</code></li>
+          <li>Adopter identifies a dog to apply for and proceeds to submit a request</li>
+        </ol>
+      </div>
+
+      <!-- Adoption Flow -->
+      <div class="process-card">
+        <div class="process-card-header">
+          <span class="process-icon">💌</span>
+          <div>
+            <h3>Adoption Request</h3>
+            <p>An adopter applies for a dog</p>
+          </div>
+        </div>
+        <ol class="process-steps">
+          <li>Adopter submits name, email, phone, and message to <code>POST /dogs/{dogId}/adoptions</code></li>
+          <li>Dog status moves to <code>reserved</code>, blocking further requests while under review</li>
+          <li>Platform publishes <span class="event-badge">adoption.requested</span> event; rescue is notified</li>
+          <li>Rescue reviews the request and confirms or rejects the adoption offline</li>
+        </ol>
+      </div>
+
+      <!-- Dog Update / Removal -->
+      <div class="process-card">
+        <div class="process-card-header">
+          <span class="process-icon">✏️</span>
+          <div>
+            <h3>Dog Update &amp; Removal</h3>
+            <p>A rescue maintains its dog listings</p>
+          </div>
+        </div>
+        <ol class="process-steps">
+          <li>Rescue updates details or status via <code>PUT /dogs/{dogId}</code>; platform publishes <span class="event-badge">dog.updated</span></li>
+          <li>Marking a dog <code>unavailable</code> hides it from active search results</li>
+          <li>Rescue permanently removes a dog via <code>DELETE /dogs/{dogId}</code>; platform publishes <span class="event-badge">dog.removed</span></li>
+          <li>Downstream consumers (search indexes, analytics) react to the event without polling</li>
+        </ol>
       </div>
     </div>
   </div>
